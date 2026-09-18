@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { rateLimit } from './rateLimit';
-import { requireAuth, type AuthenticatedRequest } from './auth';
-import { supabaseFetch } from './supabaseRest';
+import { rateLimit } from './rateLimit.js';
+import { requireAuth, type AuthenticatedRequest } from './auth.js';
+import { supabaseFetch } from './supabaseRest.js';
 
 const router = Router();
 

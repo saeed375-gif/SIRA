@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
-import { config } from './config';
-import { restPath, supabaseFetch } from './supabaseRest';
+import { config } from './config.js';
+import { restPath, supabaseFetch } from './supabaseRest.js';
 
 export type SiraRole = 'admin' | 'editor' | 'reviewer' | 'user';
 export type AuthenticatedRequest = Request & {

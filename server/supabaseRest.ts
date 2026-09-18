@@ -1,4 +1,4 @@
-import { config, assertSupabase } from './config';
+import { config, assertSupabase } from './config.js';
 
 type FetchOptions = RequestInit & {
   accessToken?: string;

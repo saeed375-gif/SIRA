@@ -1,5 +1,5 @@
-import app from './app';
-import { config, hasSupabase } from './config';
+import app from './app.js';
+import { config, hasSupabase } from './config.js';
 
 app.listen(config.port, '0.0.0.0', () => {
   console.log(`Sira API listening on http://localhost:${config.port}`);

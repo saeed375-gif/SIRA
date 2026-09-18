@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { restPath, rpc, supabaseFetch } from './supabaseRest';
-import { rateLimit } from './rateLimit';
+import { restPath, rpc, supabaseFetch } from './supabaseRest.js';
+import { rateLimit } from './rateLimit.js';
 
 const router = Router();
 const page = (value: unknown, fallback: number, max: number) => Math.max(0, Math.min(Number(value) || fallback, max));

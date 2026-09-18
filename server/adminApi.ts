@@ -1,9 +1,9 @@
 import express, { Router } from 'express';
 import crypto from 'node:crypto';
-import { requireAuth, requireRole, type AuthenticatedRequest } from './auth';
-import { config } from './config';
-import { restPath, supabaseFetch } from './supabaseRest';
-import { rateLimit } from './rateLimit';
+import { requireAuth, requireRole, type AuthenticatedRequest } from './auth.js';
+import { config } from './config.js';
+import { restPath, supabaseFetch } from './supabaseRest.js';
+import { rateLimit } from './rateLimit.js';
 
 const router = Router();
 router.use(requireAuth);

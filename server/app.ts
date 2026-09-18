@@ -1,11 +1,11 @@
 import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import publicApi from './publicApi';
-import authApi from './authApi';
-import adminApi from './adminApi';
-import { hasSupabase } from './config';
-import { SupabaseHttpError } from './supabaseRest';
+import publicApi from './publicApi.js';
+import authApi from './authApi.js';
+import adminApi from './adminApi.js';
+import { hasSupabase } from './config.js';
+import { SupabaseHttpError } from './supabaseRest.js';
 
 const app = express();
 
