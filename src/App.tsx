@@ -17,6 +17,7 @@ import { RoutesView } from './views/RoutesView';
 import { RouteDetailView } from './views/RouteDetailView';
 import { SearchView } from './views/SearchView';
 import { AboutView } from './views/AboutView';
+import { GamesView } from './views/GamesView';
 import { loadSiraDatabaseData } from './services/siraData';
 import { Heart, Sparkles, MapPin, Compass, Navigation } from 'lucide-react';
 
@@ -223,7 +224,20 @@ export default function App() {
       );
     }
 
-    // 5. Search & Favorites: /search
+    // 5. Interactive games: /games
+    if (path === '/games') {
+      return (
+        <GamesView
+          places={places}
+          routes={routes}
+          progress={progress}
+          onNavigate={navigate}
+          onGameComplete={handlePlaceChallengeSuccess}
+        />
+      );
+    }
+
+    // 6. Search & Favorites: /search
     if (path === '/search') {
       return (
         <SearchView
@@ -235,7 +249,7 @@ export default function App() {
       );
     }
 
-    // 6. About Page: /about
+    // 7. About Page: /about
     if (path === '/about') {
       return (
         <AboutView onNavigate={navigate} />
@@ -307,6 +321,11 @@ export default function App() {
                 <li>
                   <button onClick={() => navigate('/routes')} className="hover:text-[#E5C158] transition-colors">
                     مسارات المشي في البلدة القديمة
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => navigate('/games')} className="hover:text-[#E5C158] transition-colors">
+                    الألعاب التفاعلية
                   </button>
                 </li>
                 <li>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Compass, Map, Navigation, Award, Info, Search, Sparkles, Menu, X, Bookmark } from 'lucide-react';
+import { Compass, Map, Navigation, Info, Search, Sparkles, Menu, X, Gamepad2 } from 'lucide-react';
 import { UserDiscoveryProgress } from '../types';
 import { SiraLogo } from './SiraLogo';
 
@@ -22,6 +22,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { path: '/', label: 'الرئيسية', icon: Compass },
     { path: '/explore', label: 'استكشف الخريطة', icon: Map },
     { path: '/routes', label: 'المسارات', icon: Navigation },
+    { path: '/games', label: 'الألعاب التفاعلية', icon: Gamepad2 },
     { path: '/search', label: 'بحث', icon: Search },
     { path: '/about', label: 'عن سيرة', icon: Info },
   ];
@@ -69,7 +70,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 key={item.path}
                 onClick={() => handleNavClick(item.path)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`flex items-center gap-2 px-3 lg:px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                   isActive
                     ? 'bg-gradient-to-r from-[#D4AF37] to-[#E5C158] text-[#110B29] shadow-md shadow-[#D4AF37]/20'
                     : 'text-[#C4B7D8] hover:text-[#FAF8F5] hover:bg-[#251854]/60'
@@ -83,7 +84,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
 
         {/* Right side: Discovery Progress Badge & Actions */}
-        <div className="hidden sm:flex items-center gap-3">
+        <div className="hidden xl:flex items-center gap-3">
           {/* Discovery Progress Pill */}
           <div
             onClick={() => handleNavClick('/explore')}

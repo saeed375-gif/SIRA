@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, Map, Navigation, Bookmark, Award } from 'lucide-react';
+import { Compass, Map, Navigation, Bookmark, Gamepad2 } from 'lucide-react';
 
 interface MobileBottomNavProps {
   currentPath: string;
@@ -16,6 +16,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     { path: '/', label: 'الرئيسية', icon: Compass },
     { path: '/explore', label: 'استكشف', icon: Map },
     { path: '/routes', label: 'المسارات', icon: Navigation },
+    { path: '/games', label: 'ألعاب', icon: Gamepad2 },
     { path: '/search', label: 'المفضلة', icon: Bookmark, badge: favoritesCount > 0 ? favoritesCount : undefined },
   ];
 
