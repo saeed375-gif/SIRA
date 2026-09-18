@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+}
+
+.font-serif-ar {
+  font-family: 'Amiri', 'Traditional Arabic', serif;
+}
+
+.font-num {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Custom sleek scrollbar for Sira */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #110B29;
+}
+::-webkit-scrollbar-thumb {
+  background: #2E1F5E;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D4AF37;
+}
+
+/* Audio wave animation */
+@keyframes pulseWave {
+  0%, 100% { height: 20%; }
+  50% { height: 100%; }
+}
+.wave-bar-active {
+  animation: pulseWave 1.2s ease-in-out infinite;
+}
+
+/* Life uses Sira's existing ink, gold, Cairo and Amiri tokens. */
+.life-shell { width: min(100% - 2rem, 1180px); margin-inline: auto; }
+.life-home { background: radial-gradient(ellipse at 85% 0%, #34204c66, transparent 65%), #110b29; border-block: 1px solid #302045; }
+.life-eyebrow { color: #e5c158; font-size: .75rem; font-weight: 600; }
+.life-paper { background: #f2ebdf; color: #211537; }
+.life-button { display: inline-flex; align-items: center; justify-content: center; gap: .55rem; min-height: 44px; padding: .7rem 1rem; border-radius: .75rem; background: #e5c158; color: #110b29; font-size: .8rem; font-weight: 700; transition: transform .2s, background .2s; }
+.life-button:hover { background: #ffe79a; transform: translateY(-2px); }
+.life-button-outline { background: #160e36bb; color: #fff5db; border: 1px solid #d4af3780; }
+.life-button-outline:hover { background: #251854; }
+.life-location { display: inline-flex; align-items: center; gap: .4rem; font-size: .75rem; color: #e5c158; min-height: 32px; }
+.life-location:hover { color: #ffe79a; text-decoration: underline; }
+.life-chip { display: inline-flex; align-items: center; gap: .4rem; padding: .65rem .9rem; border: 1px solid #3c2975; border-radius: 12px; white-space: nowrap; font-size: .75rem; color: #d8cde8; min-height: 44px; }
+.life-chip.active { color: #110b29; background: #e5c158; border-color: #e5c158; }
+.jerusalem-moment { position: relative; isolation: isolate; min-height: 390px; overflow: hidden; border-radius: 20px; display: flex; align-items: end; background: #211537; }
+.jerusalem-moment > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: transform 1s ease; }
+.jerusalem-moment:hover > img { transform: scale(1.035); }
+.moment-shade { position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg,#100b23fa 0%,#100b23b8 50%,#100b2311 100%); }
+.moment-copy { padding: clamp(1.3rem,3vw,2.4rem); width: 100%; }
+.moment-full { min-height: min(650px,75dvh); }
+.life-moments-strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(280px,1fr); gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 12px; }
+.life-moments-strip > * { scroll-snap-align: start; }
+.life-route-row { width: 100%; display: flex; align-items: center; gap: 1rem; padding: 1rem; border-radius: 16px; border: 1px solid #352446; background: #160e36; transition: border-color .2s; }
+.life-route-row:hover { border-color: #d4af37; }
+.life-route-row img { width: 80px; height: 68px; object-fit: cover; border-radius: 10px; }
+.life-disclosure { border-top: 1px solid #d4af3744; padding-block: 20px; }
+.life-disclosure summary { cursor: pointer; color: #e5c158; }
+.sira-source-dialog { margin: auto; padding: 0; border: 0; background: transparent; color: #faf8f5; width: min(94vw, 672px); max-height: 90dvh; }
+.sira-source-dialog::backdrop { background: #090518cc; backdrop-filter: blur(7px); }
+button, summary { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2px solid #ffe79a; outline-offset: 4px; }
+section[id] { scroll-margin-top: 145px; }
+@media (max-width: 640px) { .life-moments-strip { grid-auto-columns: 87%; } .life-route-row { gap: .65rem; padding: .8rem; } .life-route-row img { width: 56px; height: 64px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }

@@ -1,0 +1,6 @@
+{
+  "name": "سيرة | Sira",
+  "description": "تجربة رقمية تفاعلية حية لاكتشاف القدس عبر خريطة تفاعلية حقيقية، مسارات حية، قصص موثقة، وتحديات ثقافية.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
