@@ -33,7 +33,7 @@ View your app in AI Studio: https://ai.studio/apps/cbe00d19-4132-4170-9603-1dd1b
 
 ## Supabase integration (this package)
 
-This archive keeps the original Sira frontend and Google Maps component intact. The runtime architecture is:
+The Sira frontend uses a key-free Leaflet/OpenStreetMap map with interactive markers and routes. The runtime architecture is:
 
 `Existing React/Vite UI -> Express API (/api) -> Supabase/PostgreSQL`
 

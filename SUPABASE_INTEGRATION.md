@@ -4,8 +4,8 @@
 - Region: `eu-central-1`
 - Public runtime reads: Supabase RLS-protected API through the local Express server.
 - Frontend design: preserved.
-- `src/components/JerusalemMap.tsx`: not modified by this integration.
-- Google Maps key/implementation: preserved from the uploaded project.
+- `src/components/JerusalemMap.tsx`: uses Leaflet/OpenStreetMap without an API key.
+- Map markers, route lines, place selection, recentering and style switching are preserved.
 - Core places are stored in Supabase and are overlaid onto the exact frontend models by slug.
 - Existing frontend IDs are intentionally preserved to avoid breaking routes, daily-life stories, challenge choices and map interactions.
 - Full normalized schema and migrations live in `supabase/migrations/`.

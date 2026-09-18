@@ -1,5 +1,7 @@
 # Sira — Correct Frontend + Supabase Integration
 
+> Post-deployment reliability update: the invalid Google Maps key implementation was replaced with a key-free Leaflet/OpenStreetMap map while preserving the Sira markers, routes and interactions.
+
 This integration was performed on the exact archive uploaded in the latest turn: `سيرة-_-sira (1).zip`.
 
 ## Frontend preservation

@@ -6,13 +6,13 @@ const fail = (message) => { console.error(`✗ ${message}`); process.exitCode = 
 const ok = (message) => console.log(`✓ ${message}`);
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
 
-const src = read('src/App.tsx') + '\n' + read('src/services/siraData.ts');
+const map = read('src/components/JerusalemMap.tsx');
+const src = read('src/App.tsx') + '\n' + read('src/services/siraData.ts') + '\n' + map;
 if (src.includes('SUPABASE_SERVICE_ROLE_KEY')) fail('service-role key name leaked into frontend source'); else ok('no service-role key in frontend source');
 if (/AIza[0-9A-Za-z_-]{20,}/.test(src)) fail('hard-coded Google API key detected in frontend source'); else ok('no hard-coded Google API key in frontend source');
 if (!src.includes('loadSiraDatabaseData')) fail('Supabase/API data overlay is not wired into App'); else ok('Supabase/API data overlay wired into App');
 
-const map = read('src/components/JerusalemMap.tsx');
-if (!map.includes('@googlemaps/js-api-loader') || !map.includes('new google.maps.Map')) fail('Google Maps implementation missing'); else ok('Google Maps implementation preserved');
+if (!map.includes("from 'leaflet'") || !map.includes('L.map(') || !map.includes('tile.openstreetmap.org')) fail('Leaflet/OpenStreetMap implementation missing'); else ok('Leaflet/OpenStreetMap implementation configured');
 
 const migrationsDir = path.join(root, 'supabase', 'migrations');
 const migrations = fs.readdirSync(migrationsDir).filter((n) => n.endsWith('.sql')).sort();
