@@ -56,7 +56,7 @@ export const AudioStoryPlayer: React.FC<Props> = ({ title, durationSeconds, narr
   };
   return <div className={`sira-audio rounded-2xl bg-[#160E36] border p-5 ${playing ? 'border-[#E5C158] shadow-lg shadow-[#D4AF37]/10' : 'border-[#D4AF37]/30'}`}>
     <div className="flex gap-3 items-start"><Volume2 className="w-5 h-5 text-[#E5C158] shrink-0" /><div>
-      <p className="text-xs text-[#E5C158] mb-1">{placeName} · {isAiGenerated ? 'سرد عربي مولّد بالذكاء الاصطناعي' : audioUrl ? (isDemo ? 'عيّنة صوتية مصنوعة' : narrator) : 'قراءة آلية للنص'}</p>
+      <p className="text-xs text-[#E5C158] mb-1">{placeName} · {isAiGenerated ? 'تسجيل سردي عربي مولّد بالذكاء الاصطناعي' : audioUrl ? (isDemo ? 'عيّنة صوتية مصنوعة' : narrator) : 'قراءة آلية للنص'}</p>
       <h3 className="text-lg text-[#FAF8F5] font-bold">{title}</h3>
     </div></div>
     {audioUrl && <audio ref={audio} src={audioUrl} preload="metadata" onPlay={() => { setPlaying(true); setEnded(false); }} onPause={() => setPlaying(false)} onEnded={() => { setPlaying(false); setEnded(true); }} onTimeUpdate={e => setTime(e.currentTarget.currentTime)} onLoadedMetadata={e => setDuration(e.currentTarget.duration)} onError={() => { setPlaying(false); setError('تعذّر تحميل الملف الصوتي. يمكنك قراءة النص الكامل أدناه.'); }} />}
