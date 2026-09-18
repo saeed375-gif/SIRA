@@ -9,7 +9,7 @@ import { SourcesModal } from './SourcesModal';
 const icons = { food: Wheat, craft: Scissors, market: ShoppingBag, culture: Music, tradition: Coffee, people: Users, sound: Volume2, 'daily-life': Camera };
 type Navigate = { onNavigate: (path: string) => void };
 const location = (s: LifeStory) => JERUSALEM_PLACES.find(p => p.id === s.placeId)!;
-export const StoryAudio = ({ story }: { story: LifeStory }) => <AudioStoryPlayer key={story.id} title={story.title} durationSeconds={story.audioDurationSeconds || 12} narrator="نموذج سيرة" script={story.audioTranscript || story.body} highlights={[{ time: 0, text: story.summary }]} placeName={location(story).name} audioUrl={story.audioUrl} isDemo={story.isDemo} />;
+export const StoryAudio = ({ story }: { story: LifeStory }) => <AudioStoryPlayer key={story.id} title={story.title} durationSeconds={story.audioDurationSeconds || 30} narrator="سرد سيرة" script={story.audioTranscript || story.body} highlights={[{ time: 0, text: story.summary }]} placeName={location(story).name} audioUrl={story.audioUrl} isDemo={story.isDemo} isAiGenerated />;
 export const DailyLifeStory: React.FC<{ story: LifeStory } & Navigate> = ({ story, onNavigate }) => {
   const Icon = icons[story.category];
   const [expanded, setExpanded] = useState(false);
@@ -89,5 +89,5 @@ export function HomeLifeRoutes({ onNavigate }: Navigate) {
 }
 export function HomeSounds({ onNavigate }: Navigate) {
   const sound = LIFE_STORIES.find(s => s.contentType === 'audio')!;
-  return <section className="life-shell py-14"><div className="grid md:grid-cols-2 gap-8 items-center"><div><span className="life-eyebrow">أصوات القدس</span><h2 className="font-serif-ar text-4xl font-bold my-4">أصغِ إلى ما بين الحكايات</h2><p className="text-sm text-[#C4B7D8] leading-loose mb-5">للأماكن إيقاعها أيضًا. جرّب الإنصات، ثم عُد إلى الخريطة. العيّنة الحالية مصنوعة للتجربة وليست تسجيلًا من المدينة.</p><button className="life-location" onClick={() => onNavigate(lifeMapLink(sound.placeId))}><MapPin size={16} />اعرض المكان على الخريطة</button></div><StoryAudio story={sound} /></div></section>;
+  return <section className="life-shell py-14"><div className="grid md:grid-cols-2 gap-8 items-center"><div><span className="life-eyebrow">أصوات القدس</span><h2 className="font-serif-ar text-4xl font-bold my-4">أصغِ إلى حكاية السوق</h2><p className="text-sm text-[#C4B7D8] leading-loose mb-5">سرد عربي يحملك إلى خان الزيت عبر وصف خطواته وروائحه ونداءات باعته. التسجيل مولّد بالذكاء الاصطناعي من نص سيرة، وليس تسجيلًا ميدانيًا.</p><button className="life-location" onClick={() => onNavigate(lifeMapLink(sound.placeId))}><MapPin size={16} />اعرض المكان على الخريطة</button></div><StoryAudio story={sound} /></div></section>;
 }

@@ -78,6 +78,8 @@ export interface Place {
     durationSeconds: number;
     narrator: string;
     script: string;
+    audioUrl?: string;
+    isAiGenerated?: boolean;
     audioTextHighlights: Array<{ time: number; text: string }>;
   };
   nearbyPlaces: NearbyPlace[];

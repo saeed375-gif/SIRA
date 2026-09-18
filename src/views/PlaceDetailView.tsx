@@ -250,6 +250,8 @@ export const PlaceDetailView: React.FC<PlaceDetailViewProps> = ({
             script={place.audioStory.script}
             highlights={place.audioStory.audioTextHighlights}
             placeName={place.name}
+            audioUrl={place.audioStory.audioUrl}
+            isAiGenerated={place.audioStory.isAiGenerated}
           />
         </section>
 
