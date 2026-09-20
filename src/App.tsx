@@ -120,6 +120,7 @@ export default function App() {
         const { gamePoints: _obsoleteGamePoints, ...savedProgress } = parsed;
         return {
           ...savedProgress,
+          journeys: parsed.journeys || {},
           kidsMapGame: parsed.kidsMapGame || { completedStageIds: [], stagePoints: 0 },
         };
       }
@@ -129,6 +130,7 @@ export default function App() {
       discoveredPlaceIds: ['bab-al-amoud'], // Bab al-Amoud discovered by default
       completedChallenges: [],
       favoritePlaceIds: [],
+      journeys: {},
       kidsMapGame: { completedStageIds: [], stagePoints: 0 },
     };
   });
@@ -271,6 +273,33 @@ export default function App() {
     return true;
   };
 
+  const handleJourneyStopReveal = (journeyId: string, stopNumber: number) => {
+    setProgress((prev) => {
+      const journeys = prev.journeys || {};
+      const journey = journeys[journeyId] || { revealedStopNumbers: [] };
+      if (journey.revealedStopNumbers.includes(stopNumber)) return prev;
+      return {
+        ...prev,
+        journeys: {
+          ...journeys,
+          [journeyId]: { ...journey, revealedStopNumbers: [...journey.revealedStopNumbers, stopNumber] },
+        },
+      };
+    });
+  };
+
+  const handleJourneyComplete = (journeyId: string) => {
+    setProgress((prev) => {
+      const journeys = prev.journeys || {};
+      const journey = journeys[journeyId] || { revealedStopNumbers: [] };
+      if (journey.completedAt) return prev;
+      return {
+        ...prev,
+        journeys: { ...journeys, [journeyId]: { ...journey, completedAt: new Date().toISOString() } },
+      };
+    });
+  };
+
   // Mark place as discovered on visit
   const handleDiscoverPlace = (place: Place) => {
     setSelectedPlace(place);
@@ -318,6 +347,9 @@ export default function App() {
             onChallengeSuccess={handlePlaceChallengeSuccess}
             places={places}
             onNavigate={navigate}
+            journeyProgress={progress.journeys?.[foundRoute.id]}
+            onJourneyStopReveal={(stopNumber) => handleJourneyStopReveal(foundRoute.id, stopNumber)}
+            onJourneyComplete={() => handleJourneyComplete(foundRoute.id)}
           />
         );
       }

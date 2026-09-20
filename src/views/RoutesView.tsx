@@ -68,6 +68,13 @@ export const RoutesView: React.FC<RoutesViewProps> = ({ routes, onNavigate }) =>
                   {route.description}
                 </p>
 
+                {route.slug === 'journey-in-heart-of-jerusalem' && (
+                  <div className="rounded-xl border border-[#D4AF37]/30 bg-[#E5C158]/5 px-3 py-2.5 text-xs leading-relaxed text-[#D8CDE8]">
+                    <Sparkles className="inline h-3.5 w-3.5 text-[#E5C158] ml-1.5" />
+                    <strong className="text-[#E5C158]">رحلة سيرة:</strong> ليست محطات منفصلة؛ كل محطة تكشف فصلًا من حكاية واحدة.
+                  </div>
+                )}
+
                 {/* Stops Timeline Preview */}
                 <div className="space-y-2">
                   <span className="text-xs font-bold text-[#A89CB9] block">
@@ -105,7 +112,7 @@ export const RoutesView: React.FC<RoutesViewProps> = ({ routes, onNavigate }) =>
                     className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#E5C158] hover:from-[#E5C158] hover:to-[#FFE79A] text-[#110B29] font-bold text-xs shadow-xl shadow-[#D4AF37]/20 transition-all active:scale-95"
                   >
                     <Navigation className="w-3.5 h-3.5" />
-                    <span>تتبع المسار على الخريطة الحية</span>
+                    <span>{route.slug === 'journey-in-heart-of-jerusalem' ? 'ابدأ حكاية الرحلة' : 'تتبع المسار على الخريطة الحية'}</span>
                   </button>
                 </div>
               </div>

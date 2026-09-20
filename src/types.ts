@@ -123,11 +123,18 @@ export interface Route {
   tags: string[];
 }
 
+export interface SiraJourneyProgress {
+  revealedStopNumbers: number[];
+  completedAt?: string;
+}
+
 export interface UserDiscoveryProgress {
   discoveredPlaceIds: string[];
   completedChallenges: string[];
   totalPoints: number;
   favoritePlaceIds: string[];
+  /** The chapters a visitor has uncovered in each connected Sira journey. */
+  journeys?: Record<string, SiraJourneyProgress>;
   /** Progress inside the four-stage children's map adventure. */
   kidsMapGame?: {
     completedStageIds: string[];

@@ -1,8 +1,9 @@
 import { LIFE_STORIES } from '../data/lifeData';
 import { DailyLifeStory, StoryAudio } from '../components/LifeExperience';
 import { PlaceChallenge } from '../components/PlaceChallenge';
+import { SiraJourneyStory } from '../components/SiraJourneyStory';
 import React, { useState } from 'react';
-import { Route, Place, RouteStop } from '../types';
+import { Route, Place, RouteStop, SiraJourneyProgress } from '../types';
 import { JerusalemMap } from '../components/JerusalemMap';
 import { 
   Navigation, 
@@ -23,6 +24,9 @@ interface RouteDetailViewProps {
   route: Route;
   places: Place[];
   onNavigate: (path: string) => void;
+  journeyProgress?: SiraJourneyProgress;
+  onJourneyStopReveal: (stopNumber: number) => void;
+  onJourneyComplete: () => void;
 }
 
 export const RouteDetailView: React.FC<RouteDetailViewProps> = ({
@@ -30,9 +34,19 @@ export const RouteDetailView: React.FC<RouteDetailViewProps> = ({
   onChallengeSuccess,
   places,
   onNavigate,
+  journeyProgress,
+  onJourneyStopReveal,
+  onJourneyComplete,
 }) => {
-  const [activeStopIndex, setActiveStopIndex] = useState<number>(0);
+  const [activeStopIndex, setActiveStopIndex] = useState<number>(() => {
+    const revealedStopNumbers = journeyProgress?.revealedStopNumbers || [];
+    const nextStop = route.stops.findIndex((stop) => !revealedStopNumbers.includes(stop.stepNumber));
+    return nextStop === -1 ? 0 : nextStop;
+  });
   const activeStop = route.stops[activeStopIndex] || route.stops[0];
+  const revealedStopNumbers = journeyProgress?.revealedStopNumbers || [];
+  const isCurrentStopRevealed = revealedStopNumbers.includes(activeStop.stepNumber);
+  const canMoveToStop = (index: number) => index === 0 || revealedStopNumbers.includes(route.stops[index - 1].stepNumber);
 
   const stopStory = LIFE_STORIES.find(s => s.id === activeStop.storyId);
 
@@ -51,7 +65,7 @@ export const RouteDetailView: React.FC<RouteDetailViewProps> = ({
           selectedPlace={correspondingPlace || null}
           activeRoute={route}
           activeStopIndex={activeStopIndex}
-          onSelectStop={(_, index) => setActiveStopIndex(index)}
+          onSelectStop={(_, index) => { if (canMoveToStop(index)) setActiveStopIndex(index); }}
           className="w-full h-full"
           zoomLevel={16}
           centerCoords={{ lat: activeStop.lat, lng: activeStop.lng }}
@@ -104,17 +118,21 @@ export const RouteDetailView: React.FC<RouteDetailViewProps> = ({
         <div className="px-4 py-3 bg-[#160E36] border-b border-[#2B1E55] flex items-center justify-between gap-1 overflow-x-auto scrollbar-none">
           {route.stops.map((stop, idx) => {
             const isActive = idx === activeStopIndex;
-            const isCompleted = idx < activeStopIndex;
+            const isCompleted = revealedStopNumbers.includes(stop.stepNumber);
+            const isLocked = !canMoveToStop(idx);
             return (
               <button
                 key={stop.stepNumber}
                 id={`route-step-node-${stop.stepNumber}`}
-                onClick={() => setActiveStopIndex(idx)}
+                onClick={() => { if (!isLocked) setActiveStopIndex(idx); }}
+                disabled={isLocked}
                 className={`flex-1 min-w-[75px] py-2 px-1.5 rounded-xl border flex flex-col items-center justify-center transition-all ${
                   isActive
                     ? 'bg-[#E5C158] text-[#110B29] border-[#E5C158] font-bold shadow-lg shadow-[#D4AF37]/20 scale-105'
                     : isCompleted
                     ? 'bg-[#1C133D] text-[#E5C158] border-[#3C2975]'
+                    : isLocked
+                    ? 'bg-[#110B29] text-[#645777] border-[#251850] opacity-55 cursor-not-allowed'
                     : 'bg-[#110B29] text-[#8E80A4] border-[#251850] hover:border-[#D4AF37]/50'
                 }`}
               >
@@ -132,6 +150,15 @@ export const RouteDetailView: React.FC<RouteDetailViewProps> = ({
 
         {/* Active Stop Details Card */}
         <div key={activeStopIndex} className="flex-1 overflow-y-auto overscroll-contain p-4 md:p-5 space-y-4">
+          <SiraJourneyStory
+            route={route}
+            places={places}
+            activeStopIndex={activeStopIndex}
+            progress={journeyProgress}
+            onRevealStop={onJourneyStopReveal}
+            onComplete={onJourneyComplete}
+          />
+
           {!stopStory && correspondingPlace && (
             <div className="sira-image-overlay relative rounded-2xl overflow-hidden border border-[#3C2975] h-44 shadow-lg group">
               <img
@@ -212,9 +239,10 @@ export const RouteDetailView: React.FC<RouteDetailViewProps> = ({
           {activeStopIndex < route.stops.length - 1 ? (
             <button
               onClick={() => setActiveStopIndex((prev) => Math.min(route.stops.length - 1, prev + 1))}
-              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#E5C158] hover:from-[#E5C158] hover:to-[#FFE79A] text-[#110B29] text-xs font-bold shadow-lg shadow-[#D4AF37]/20 transition-all active:scale-95"
+              disabled={!isCurrentStopRevealed}
+              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#E5C158] hover:from-[#E5C158] hover:to-[#FFE79A] text-[#110B29] text-xs font-bold shadow-lg shadow-[#D4AF37]/20 transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <span>المحطة التالية</span>
+              <span>{isCurrentStopRevealed ? 'المحطة التالية' : 'اكشف فصل المحطة أولًا'}</span>
               <ChevronLeft className="w-4 h-4" />
             </button>
           ) : (
