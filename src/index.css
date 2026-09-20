@@ -9,7 +9,24 @@
   body {
     font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     direction: rtl;
+    /* Google Translate reserves space for its browser-style banner by adding
+       an inline `top` offset to the body. Keep translation in-page only. */
+    top: 0 !important;
   }
+}
+
+/* The language control is part of Sira's navigation. Hide Google Translate's
+   injected toolbar so only the translated page is shown. */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+iframe.goog-te-banner-frame,
+body > .skiptranslate {
+  display: none !important;
+}
+
+html,
+body {
+  margin-top: 0 !important;
 }
 
 .font-serif-ar {
