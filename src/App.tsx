@@ -18,7 +18,9 @@ import { RouteDetailView } from './views/RouteDetailView';
 import { SearchView } from './views/SearchView';
 import { AboutView } from './views/AboutView';
 import { GamesView } from './views/GamesView';
+import { GamesAuthLoading, GamesAuthView } from './views/GamesAuthView';
 import { loadSiraDatabaseData } from './services/siraData';
+import { restoreSiraSession, signOutFromSira, type SiraSession } from './services/auth';
 import { Heart, Sparkles, MapPin, Compass, Navigation } from 'lucide-react';
 
 const STATIC_ALL_ROUTES = [...JERUSALEM_ROUTES, ...LIFE_ROUTES];
@@ -38,6 +40,41 @@ export default function App() {
   // the editable core fields. This preserves the map/routes/challenge IDs used by the UI.
   const [places, setPlaces] = useState<Place[]>(JERUSALEM_PLACES);
   const [routes, setRoutes] = useState<Route[]>(STATIC_ALL_ROUTES);
+
+  // Authentication is intentionally scoped to the games experience. The rest of Sira
+  // remains available to guests without creating an account.
+  const [gameSession, setGameSession] = useState<SiraSession | null>(null);
+  const [gameAuthStatus, setGameAuthStatus] = useState<'idle' | 'loading' | 'guest' | 'authenticated'>('idle');
+
+  useEffect(() => {
+    if (path !== '/games') return;
+    let active = true;
+    setGameAuthStatus('loading');
+    restoreSiraSession()
+      .then((session) => {
+        if (!active) return;
+        setGameSession(session);
+        setGameAuthStatus(session ? 'authenticated' : 'guest');
+      })
+      .catch(() => {
+        if (!active) return;
+        setGameSession(null);
+        setGameAuthStatus('guest');
+      });
+    return () => { active = false; };
+  }, [path]);
+
+  const handleGameAuthenticated = (session: SiraSession) => {
+    setGameSession(session);
+    setGameAuthStatus('authenticated');
+  };
+
+  const handleGameSignOut = async () => {
+    const accessToken = gameSession?.accessToken;
+    setGameSession(null);
+    setGameAuthStatus('guest');
+    try { await signOutFromSira(accessToken); } catch { /* Local session is already cleared. */ }
+  };
 
   // Selected Place state for map synchronicity
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(() => JERUSALEM_PLACES.find(p => p.slug === new URLSearchParams(window.location.search).get('place')) || JERUSALEM_PLACES[0]);
@@ -226,6 +263,10 @@ export default function App() {
 
     // 5. Interactive games: /games
     if (path === '/games') {
+      if (gameAuthStatus === 'idle' || gameAuthStatus === 'loading') return <GamesAuthLoading />;
+      if (!gameSession) {
+        return <GamesAuthView onAuthenticated={handleGameAuthenticated} onBack={() => navigate('/')} />;
+      }
       return (
         <GamesView
           places={places}
@@ -233,6 +274,8 @@ export default function App() {
           progress={progress}
           onNavigate={navigate}
           onGameComplete={handlePlaceChallengeSuccess}
+          user={gameSession.user}
+          onSignOut={handleGameSignOut}
         />
       );
     }

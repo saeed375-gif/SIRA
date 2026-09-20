@@ -2,9 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeft, Brain, CheckCircle2, ChevronDown, ChevronUp, Clock3, Compass,
   Flame, Gamepad2, Heart, KeyRound, Landmark, Lightbulb, LockKeyhole,
-  MapPinned, RotateCcw, Shield, Target, Timer, Trophy, XCircle, Zap,
+  LogOut, MapPinned, RotateCcw, Shield, Target, Timer, Trophy, UserRound,
+  XCircle, Zap,
 } from 'lucide-react';
 import type { Place, Route, UserDiscoveryProgress } from '../types';
+import type { SiraUser } from '../services/auth';
 
 type GameId = 'blitz' | 'memory' | 'timeline' | 'compass' | 'vault';
 
@@ -14,6 +16,8 @@ interface GamesViewProps {
   progress: UserDiscoveryProgress;
   onNavigate: (path: string) => void;
   onGameComplete: (gameId: string, points: number) => void;
+  user: SiraUser;
+  onSignOut: () => void;
 }
 
 interface GameBaseProps {
@@ -384,7 +388,7 @@ const GAME_META = [
   { id: 'vault' as const, number: '05', icon: LockKeyhole, title: 'خزنة المدينة', eyebrow: 'غرفة هروب · ألغاز · شفرة', description: 'اعبر أربع غرف، اجمع أرقام الشفرة، ثم افتح أرشيف القدس قبل انطفاء المشاعل.', duration: '5 دقائق', difficulty: 'خبير', accent: 'from-[#F472B6]/20 to-transparent' },
 ];
 
-export const GamesView: React.FC<GamesViewProps> = ({ progress, onNavigate, onGameComplete }) => {
+export const GamesView: React.FC<GamesViewProps> = ({ progress, onNavigate, onGameComplete, user, onSignOut }) => {
   const [activeGame, setActiveGame] = useState<GameId | null>(null);
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -410,6 +414,10 @@ export const GamesView: React.FC<GamesViewProps> = ({ progress, onNavigate, onGa
         <div className="grid lg:grid-cols-[1fr_310px] gap-10 items-end mt-6">
           <div><h1 className="text-4xl sm:text-6xl font-serif-ar font-bold leading-tight">القدس ليست سؤالًا.<br /><span className="text-[#E5C158]">إنها تحدٍ كامل.</span></h1><p className="max-w-2xl text-[#D8CDE8] leading-loose mt-5">ألعاب متعددة الأنماط عن تاريخ القدس وجغرافيتها وأبوابها وذاكرتها. لكل لعبة قواعدها ووقتها ومخاطرها—هل تستطيع إكمال الموسم؟</p></div>
           <div className="rounded-2xl border border-[#4B3689] bg-[#160E36]/80 backdrop-blur p-5">
+            <div className="mb-4 flex items-center justify-between gap-3 border-b border-[#2F2160] pb-4">
+              <div className="flex min-w-0 items-center gap-2.5"><div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#E5C158]/10 text-[#E5C158]"><UserRound className="h-4 w-4" /></div><div className="min-w-0"><span className="block text-[10px] text-[#8F82A3]">مرحبًا بك</span><strong className="block truncate text-sm">{user.displayName}</strong></div></div>
+              <button onClick={onSignOut} aria-label="تسجيل الخروج من ألعاب سيرة" className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-[#3C2975] text-[#A89CB9] transition hover:border-[#EF4444]/50 hover:text-[#FCA5A5]"><LogOut className="h-4 w-4" /></button>
+            </div>
             <div className="flex items-center justify-between"><span className="text-xs text-[#A89CB9]">تقدم الموسم</span><Trophy className="w-5 h-5 text-[#E5C158]" /></div>
             <div className="flex items-end gap-2 mt-3"><strong className="font-num text-4xl text-[#E5C158]">{completedCount}</strong><span className="text-sm text-[#A89CB9] mb-1">/ {GAME_META.length} ألعاب</span></div>
             <div className="h-2 rounded-full bg-[#251850] mt-4 overflow-hidden"><div className="h-full bg-gradient-to-l from-[#E5C158] to-[#FF9F43] transition-all" style={{ width: `${(completedCount / GAME_META.length) * 100}%` }} /></div>
