@@ -330,6 +330,56 @@ section[id] { scroll-margin-top: 145px; }
   color: #f3d77a !important;
 }
 
+/* The miniature-map stepper sits over a dark strip.  It needs its own
+   contrast rule because the global light-surface mapping also matches the
+   individual stop buttons. */
+.sira-theme-light .sira-map-stepper [class~="bg-[#1D143D]"] {
+  background-color: #2c1b46 !important;
+  color: #fff9ef !important;
+}
+
+.sira-theme-light .sira-map-stepper [class~="bg-[#1D143D]"] [class~="text-[#C4B7D8]"] {
+  color: #fff9ef !important;
+}
+
+/* The exploration guide intentionally becomes a warm paper panel in light
+   mode, so all header copy, search controls, and inactive filters use ink. */
+.sira-theme-light .sira-explore-view,
+.sira-theme-light .sira-explore-panel {
+  color: var(--sira-ink);
+}
+
+.sira-theme-light .sira-explore-panel-header {
+  background-color: var(--sira-paper-soft) !important;
+  color: var(--sira-ink) !important;
+}
+
+.sira-theme-light .sira-explore-panel-header [class~="text-[#FAF8F5]"],
+.sira-theme-light .sira-explore-panel-header [class~="text-[#F2EDF8]"],
+.sira-theme-light .sira-explore-panel-header [class~="text-[#C4B7D8]"],
+.sira-theme-light .sira-explore-panel-header [class~="text-[#A89CB9]"] {
+  color: var(--sira-ink) !important;
+}
+
+.sira-theme-light .sira-explore-panel-header [class~="text-[#E5C158]"],
+.sira-theme-light .sira-explore-panel-header [class~="text-[#D4AF37]"] {
+  color: var(--sira-gold-ink) !important;
+}
+
+.sira-theme-light .sira-explore-panel-header [class~="bg-[#18103A]"] {
+  background-color: #fffdf8 !important;
+  color: var(--sira-ink) !important;
+}
+
+.sira-theme-light .sira-explore-panel-header [class~="bg-[#18103A]"] [class~="text-[#C4B7D8]"] {
+  color: var(--sira-ink) !important;
+}
+
+/* Avoid fading the last word of the hero headline into the cream background. */
+.sira-theme-light .sira-hero-title-highlight {
+  background-image: linear-gradient(to left, #8a4e18, #d4af37 48%, #3a2156) !important;
+}
+
 .sira-theme-light .sira-image-hero [class~="text-[#FAF8F5]"],
 .sira-theme-light .sira-image-hero [class~="text-[#F2EDF8]"],
 .sira-theme-light .sira-image-hero [class~="text-[#A89CB9]"],

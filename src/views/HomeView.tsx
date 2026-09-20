@@ -67,7 +67,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#FAF8F5] leading-tight tracking-tight font-serif-ar">
                   لا تكتفِ برؤية القدس...
                   <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-l from-[#E5C158] via-[#F3D77A] to-[#FAF8F5]">
+                  <span className="sira-hero-title-highlight text-transparent bg-clip-text bg-gradient-to-l from-[#E5C158] via-[#F3D77A] to-[#FAF8F5]">
                     عِش حكايتها
                   </span>
                 </h1>
@@ -154,7 +154,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </div>
 
                 {/* Floating Quick Route Stepper inside Hero */}
-                <div className="p-3 bg-[#110B29]/90 border-t border-[#24174B] rounded-b-2xl flex items-center justify-between gap-2 text-xs">
+                <div className="sira-map-stepper p-3 bg-[#110B29]/90 border-t border-[#24174B] rounded-b-2xl flex items-center justify-between gap-2 text-xs">
                   <span className="text-[#A89CB9] font-medium hidden sm:inline">
                     محطات المسار المفتوح:
                   </span>

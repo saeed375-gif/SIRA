@@ -65,7 +65,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   const visibleSelected = filteredPlaces.find(p => p.id === selectedPlace?.id) || null;
 
   return (
-    <div className="h-[calc(100dvh-136px)] md:h-[calc(100dvh-72px)] flex flex-col md:flex-row bg-[#0D081F] text-[#FAF8F5] overflow-hidden relative">
+    <div className="sira-explore-view h-[calc(100dvh-136px)] md:h-[calc(100dvh-72px)] flex flex-col md:flex-row bg-[#0D081F] text-[#FAF8F5] overflow-hidden relative">
       {/* MAP AREA (Occupies major screen space, on the left for RTL layout) */}
       <div className="h-[46%] shrink-0 md:flex-1 md:h-full relative order-1 md:order-2">
         <JerusalemMap
@@ -101,10 +101,10 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
       </div>
 
       {/* DISCOVERY PANEL (On the right in RTL, styled as a discovery guide, not a generic dashboard) */}
-      <aside className="w-full md:w-[420px] lg:w-[460px] h-[54%] md:h-full min-h-0 bg-[#110B29] border-t md:border-t-0 md:border-l border-[#24174B] flex flex-col z-30 shadow-2xl order-2 md:order-1">
+      <aside className="sira-explore-panel w-full md:w-[420px] lg:w-[460px] h-[54%] md:h-full min-h-0 bg-[#110B29] border-t md:border-t-0 md:border-l border-[#24174B] flex flex-col z-30 shadow-2xl order-2 md:order-1">
         
         {/* Panel Header */}
-        <div className="p-3 md:p-5 border-b border-[#24174B] bg-[#140E2E]/90 space-y-2.5 md:space-y-3">
+        <div className="sira-explore-panel-header p-3 md:p-5 border-b border-[#24174B] bg-[#140E2E]/90 space-y-2.5 md:space-y-3">
           <div className="flex items-center justify-between">
             <div>
               <span className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider block">
