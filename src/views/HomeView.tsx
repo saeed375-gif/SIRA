@@ -228,7 +228,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 className="group rounded-2xl bg-[#160E36] border border-[#2B1E55] hover:border-[#D4AF37]/60 shadow-xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 relative"
               >
                 {/* Place Cover Image */}
-                <div className="relative h-52 overflow-hidden">
+                <div className="sira-image-overlay relative h-52 overflow-hidden">
                   <img
                     src={place.coverImage}
                     alt={place.name}
@@ -298,7 +298,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
       <HomeMoments onNavigate={onNavigate} />
       <HomeLifeRoutes onNavigate={onNavigate} />
       {/* FEATURED ROUTE SHOWCASE («رحلة في قلب القدس») */}
-      <section className="py-12 md:py-16 bg-gradient-to-b from-[#110B29] to-[#150D33] border-b border-[#24174B]">
+      <section className="sira-inverted-panel py-12 md:py-16 bg-gradient-to-b from-[#110B29] to-[#150D33] border-b border-[#24174B]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl bg-gradient-to-br from-[#1A103D] via-[#201446] to-[#160E36] border border-[#D4AF37]/40 p-6 md:p-10 shadow-2xl relative overflow-hidden">
             {/* Background Glow */}
@@ -368,7 +368,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
               {/* Visual Cover */}
               <div className="lg:col-span-5">
-                <div className="relative rounded-2xl overflow-hidden border border-[#483387] shadow-2xl group">
+                <div className="sira-image-overlay relative rounded-2xl overflow-hidden border border-[#483387] shadow-2xl group">
                   <img
                     src={featuredRoute.coverImage}
                     alt={featuredRoute.title}

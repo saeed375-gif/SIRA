@@ -394,7 +394,7 @@ export const PlaceDetailView: React.FC<PlaceDetailViewProps> = ({
             {place.gallery.map((img, idx) => (
               <div
                 key={idx}
-                className="group relative rounded-xl overflow-hidden border border-[#3C2975] h-52"
+                className="sira-image-overlay group relative rounded-xl overflow-hidden border border-[#3C2975] h-52"
               >
                 <img
                   src={img.url}

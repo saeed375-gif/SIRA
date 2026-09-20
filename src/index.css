@@ -149,6 +149,7 @@ section[id] { scroll-margin-top: 145px; }
 
 .sira-theme-light [class~="bg-[#211537]"],
 .sira-theme-light [class~="bg-[#f2ebdf]"],
+.sira-theme-light [class~="bg-[#140E2E]"],
 .sira-theme-light [class~="bg-[#140E2E]/90"] {
   background-color: var(--sira-paper-soft) !important;
 }
@@ -192,18 +193,83 @@ section[id] { scroll-margin-top: 145px; }
   border-color: color-mix(in srgb, var(--sira-border) 75%, transparent) !important;
 }
 
-/* Dark translucent controls always receive light copy, even in light mode. */
+/* Dark translucent panels always receive light copy, even in light mode. */
+.sira-theme-light [class*="bg-[#0D081F]/"],
+.sira-theme-light [class*="bg-[#110B29]/"],
+.sira-theme-light [class*="bg-[#140E36]/"],
+.sira-theme-light [class*="bg-[#140E2E]/"],
+.sira-theme-light [class*="bg-[#160E36]/"],
+.sira-theme-light [class*="bg-[#18103A]/"],
+.sira-theme-light [class*="bg-[#1A1140]/"],
+.sira-theme-light [class*="bg-[#1B1140]/"],
+.sira-theme-light [class*="bg-[#1C123D]/"],
+.sira-theme-light [class*="bg-[#1D1244]/"],
+.sira-theme-light [class*="bg-[#251854]/"] {
+  color: #fff9ef;
+}
+
 .sira-theme-light [class*="bg-[#0D081F]/"] [class~="text-[#FAF8F5]"],
 .sira-theme-light [class*="bg-[#110B29]/"] [class~="text-[#FAF8F5]"],
 .sira-theme-light [class*="bg-[#140E36]/"] [class~="text-[#FAF8F5]"],
+.sira-theme-light [class*="bg-[#140E2E]/"] [class~="text-[#FAF8F5]"],
 .sira-theme-light [class*="bg-[#160E36]/"] [class~="text-[#FAF8F5]"],
 .sira-theme-light [class*="bg-[#18103A]/"] [class~="text-[#FAF8F5]"],
+.sira-theme-light [class*="bg-[#1A1140]/"] [class~="text-[#FAF8F5]"],
+.sira-theme-light [class*="bg-[#1B1140]/"] [class~="text-[#FAF8F5]"],
+.sira-theme-light [class*="bg-[#1C123D]/"] [class~="text-[#FAF8F5]"],
+.sira-theme-light [class*="bg-[#1D1244]/"] [class~="text-[#FAF8F5]"],
+.sira-theme-light [class*="bg-[#251854]/"] [class~="text-[#FAF8F5]"],
+.sira-theme-light [class*="bg-[#0D081F]/"] [class~="text-[#F2EDF8]"],
+.sira-theme-light [class*="bg-[#110B29]/"] [class~="text-[#F2EDF8]"],
+.sira-theme-light [class*="bg-[#140E36]/"] [class~="text-[#F2EDF8]"],
+.sira-theme-light [class*="bg-[#140E2E]/"] [class~="text-[#F2EDF8]"],
+.sira-theme-light [class*="bg-[#160E36]/"] [class~="text-[#F2EDF8]"],
+.sira-theme-light [class*="bg-[#0D081F]/"] [class~="text-[#D8CDE8]"],
+.sira-theme-light [class*="bg-[#110B29]/"] [class~="text-[#D8CDE8]"],
+.sira-theme-light [class*="bg-[#140E36]/"] [class~="text-[#D8CDE8]"],
+.sira-theme-light [class*="bg-[#140E2E]/"] [class~="text-[#D8CDE8]"],
+.sira-theme-light [class*="bg-[#160E36]/"] [class~="text-[#D8CDE8]"],
+.sira-theme-light [class*="bg-[#0D081F]/"] [class~="text-[#C4B7D8]"],
+.sira-theme-light [class*="bg-[#110B29]/"] [class~="text-[#C4B7D8]"],
+.sira-theme-light [class*="bg-[#140E36]/"] [class~="text-[#C4B7D8]"],
+.sira-theme-light [class*="bg-[#140E2E]/"] [class~="text-[#C4B7D8]"],
+.sira-theme-light [class*="bg-[#160E36]/"] [class~="text-[#C4B7D8]"],
+.sira-theme-light [class*="bg-[#0D081F]/"] [class~="text-[#A89CB9]"],
+.sira-theme-light [class*="bg-[#110B29]/"] [class~="text-[#A89CB9]"],
+.sira-theme-light [class*="bg-[#140E36]/"] [class~="text-[#A89CB9]"],
+.sira-theme-light [class*="bg-[#140E2E]/"] [class~="text-[#A89CB9]"],
+.sira-theme-light [class*="bg-[#160E36]/"] [class~="text-[#A89CB9]"],
 .sira-theme-light [class*="bg-[#0D081F]/"] .text-white,
 .sira-theme-light [class*="bg-[#110B29]/"] .text-white,
 .sira-theme-light [class*="bg-[#140E36]/"] .text-white,
+.sira-theme-light [class*="bg-[#140E2E]/"] .text-white,
 .sira-theme-light [class*="bg-[#160E36]/"] .text-white,
-.sira-theme-light [class*="bg-[#18103A]/"] .text-white {
+.sira-theme-light [class*="bg-[#18103A]/"] .text-white,
+.sira-theme-light [class*="bg-[#1A1140]/"] .text-white,
+.sira-theme-light [class*="bg-[#1B1140]/"] .text-white,
+.sira-theme-light [class*="bg-[#1C123D]/"] .text-white,
+.sira-theme-light [class*="bg-[#1D1244]/"] .text-white,
+.sira-theme-light [class*="bg-[#251854]/"] .text-white {
   color: #fff9ef !important;
+}
+
+.sira-theme-light [class*="bg-[#0D081F]/"] [class~="text-[#E5C158]"],
+.sira-theme-light [class*="bg-[#110B29]/"] [class~="text-[#E5C158]"],
+.sira-theme-light [class*="bg-[#140E36]/"] [class~="text-[#E5C158]"],
+.sira-theme-light [class*="bg-[#140E2E]/"] [class~="text-[#E5C158]"],
+.sira-theme-light [class*="bg-[#160E36]/"] [class~="text-[#E5C158]"],
+.sira-theme-light [class*="bg-[#18103A]/"] [class~="text-[#E5C158]"],
+.sira-theme-light [class*="bg-[#1A1140]/"] [class~="text-[#E5C158]"],
+.sira-theme-light [class*="bg-[#1B1140]/"] [class~="text-[#E5C158]"],
+.sira-theme-light [class*="bg-[#1C123D]/"] [class~="text-[#E5C158]"],
+.sira-theme-light [class*="bg-[#1D1244]/"] [class~="text-[#E5C158]"],
+.sira-theme-light [class*="bg-[#251854]/"] [class~="text-[#E5C158]"],
+.sira-theme-light [class*="bg-[#0D081F]/"] [class~="text-[#D4AF37]"],
+.sira-theme-light [class*="bg-[#110B29]/"] [class~="text-[#D4AF37]"],
+.sira-theme-light [class*="bg-[#140E36]/"] [class~="text-[#D4AF37]"],
+.sira-theme-light [class*="bg-[#140E2E]/"] [class~="text-[#D4AF37]"],
+.sira-theme-light [class*="bg-[#160E36]/"] [class~="text-[#D4AF37]"] {
+  color: #f3d77a !important;
 }
 
 /* The purple frame stays intentionally dark, like the poster's top and base. */
@@ -213,6 +279,13 @@ section[id] { scroll-margin-top: 145px; }
   background-color: #211238 !important;
   border-color: #604576 !important;
   color: #fff9ef;
+}
+
+/* Keep the compact controls in the dark header visibly distinct from the
+   warm page surface.  Without this, the mobile menu icon is light on light. */
+.sira-theme-light .sira-site-header [class~="bg-[#160E36]"] {
+  background-color: #160e36 !important;
+  border-color: #604576 !important;
 }
 
 .sira-theme-light .sira-site-header [class~="text-[#FAF8F5]"],
@@ -266,6 +339,36 @@ section[id] { scroll-margin-top: 145px; }
 
 .sira-theme-light .sira-image-hero [class~="text-[#E5C158]"],
 .sira-theme-light .sira-image-hero [class~="text-[#D4AF37]"] {
+  color: #f3d77a !important;
+}
+
+/* Text placed on a photo or an intentionally purple feature panel never
+   inherits the page's dark ink in light mode. */
+.sira-theme-light .sira-image-overlay,
+.sira-theme-light .sira-inverted-panel {
+  color: #fff9ef;
+}
+
+.sira-theme-light .sira-image-overlay [class~="text-[#FAF8F5]"],
+.sira-theme-light .sira-image-overlay [class~="text-[#F2EDF8]"],
+.sira-theme-light .sira-image-overlay [class~="text-[#D8CDE8]"],
+.sira-theme-light .sira-image-overlay [class~="text-[#C4B7D8]"],
+.sira-theme-light .sira-image-overlay [class~="text-[#A89CB9]"],
+.sira-theme-light .sira-image-overlay .text-white,
+.sira-theme-light .sira-inverted-panel [class~="text-[#FAF8F5]"],
+.sira-theme-light .sira-inverted-panel [class~="text-[#F2EDF8]"],
+.sira-theme-light .sira-inverted-panel [class~="text-[#D8CDE8]"],
+.sira-theme-light .sira-inverted-panel [class~="text-[#DDD5E8]"],
+.sira-theme-light .sira-inverted-panel [class~="text-[#C4B7D8]"],
+.sira-theme-light .sira-inverted-panel [class~="text-[#A89CB9]"],
+.sira-theme-light .sira-inverted-panel .text-white {
+  color: #fff9ef !important;
+}
+
+.sira-theme-light .sira-image-overlay [class~="text-[#E5C158]"],
+.sira-theme-light .sira-image-overlay [class~="text-[#D4AF37]"],
+.sira-theme-light .sira-inverted-panel [class~="text-[#E5C158]"],
+.sira-theme-light .sira-inverted-panel [class~="text-[#D4AF37]"] {
   color: #f3d77a !important;
 }
 

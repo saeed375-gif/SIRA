@@ -35,7 +35,7 @@ export const RoutesView: React.FC<RoutesViewProps> = ({ routes, onNavigate }) =>
               className="rounded-3xl bg-[#160E36] border border-[#2B1E55] hover:border-[#D4AF37]/60 shadow-2xl overflow-hidden flex flex-col justify-between group transition-all duration-300"
             >
               {/* Cover Image & Badges */}
-              <div className="relative h-64 overflow-hidden">
+              <div className="sira-image-overlay relative h-64 overflow-hidden">
                 <img
                   src={route.coverImage}
                   alt={route.title}

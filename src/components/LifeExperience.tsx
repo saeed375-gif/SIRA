@@ -35,7 +35,7 @@ export const DailyLifeStory: React.FC<{ story: LifeStory } & Navigate> = ({ stor
 export const CraftStory = DailyLifeStory;
 export const PersonStory = DailyLifeStory;
 export const JerusalemMoment: React.FC<{ story: LifeStory; full?: boolean } & Navigate> = ({ story, onNavigate, full = false }) => {
-  return <article className={`jerusalem-moment group ${full ? 'moment-full' : ''}`}>
+  return <article className={`sira-image-overlay jerusalem-moment group ${full ? 'moment-full' : ''}`}>
     <img src={story.image} srcSet={`${story.image.replace("-960.webp", "-480.webp")} 480w, ${story.image} 960w`} sizes="(max-width: 640px) 92vw, 600px" alt={story.imageAlt} loading="lazy" decoding="async" />
     <div className="moment-shade" /><div className="moment-copy">
       <span className="text-xs tracking-wide text-[#FFE79A]">لحظة مقدسية <span className="text-[#E8E0D8]">/ مشهد تجريبي</span></span>

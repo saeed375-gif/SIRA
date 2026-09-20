@@ -133,7 +133,7 @@ export const RouteDetailView: React.FC<RouteDetailViewProps> = ({
         {/* Active Stop Details Card */}
         <div key={activeStopIndex} className="flex-1 overflow-y-auto overscroll-contain p-4 md:p-5 space-y-4">
           {!stopStory && correspondingPlace && (
-            <div className="relative rounded-2xl overflow-hidden border border-[#3C2975] h-44 shadow-lg group">
+            <div className="sira-image-overlay relative rounded-2xl overflow-hidden border border-[#3C2975] h-44 shadow-lg group">
               <img
                 src={correspondingPlace.coverImage}
                 alt={activeStop.title}

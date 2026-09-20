@@ -88,7 +88,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigate }) => {
         </div>
 
         {/* Call to action */}
-        <div className="rounded-3xl bg-gradient-to-r from-[#1E1145] to-[#2B195D] border border-[#D4AF37]/40 p-8 text-center space-y-4 shadow-2xl">
+        <div className="sira-inverted-panel rounded-3xl bg-gradient-to-r from-[#1E1145] to-[#2B195D] border border-[#D4AF37]/40 p-8 text-center space-y-4 shadow-2xl">
           <h3 className="text-2xl font-bold text-[#FAF8F5] font-serif-ar">
             هل أنت جاهز لبدء رحلتك في القدس؟
           </h3>
