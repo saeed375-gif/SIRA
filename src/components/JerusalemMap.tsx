@@ -102,9 +102,6 @@ const SIRA_MAP_STYLES: google.maps.MapTypeStyle[] = [
 ];
 
 let configuredKey: string | undefined;
-// The project key is currently blocked by Google Maps Platform billing. Google
-// Maps' official embed remains interactive without exposing that error screen.
-const USE_GOOGLE_MAPS_EMBED = true;
 
 export const JerusalemMap: React.FC<JerusalemMapProps> = ({
   places,
@@ -136,7 +133,6 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
   );
 
   const apiKey = (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyDTCja-GD6n0nsmuvLvEsHADtOUX5062Fc';
-  const embedUrl = `https://maps.google.com/maps?output=embed&q=${encodeURIComponent(`${centerCoords.lat},${centerCoords.lng}`)}&z=${zoomLevel}`;
 
   // Helper to create SVG data URL for custom Sira Pin Marker
   const createMarkerIcon = useCallback((
@@ -207,11 +203,6 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
 
     const initMap = async () => {
       try {
-        if (USE_GOOGLE_MAPS_EMBED) {
-          setMapLoaded(true);
-          return;
-        }
-
         if (configuredKey !== apiKey) {
           setOptions({ key: apiKey, v: 'weekly', language: 'ar' });
           configuredKey = apiKey;
@@ -393,18 +384,7 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
   return (
     <div className={`relative overflow-hidden rounded-2xl border border-[#2B1E55] bg-[#110B29] ${className}`}>
       {/* Map Canvas */}
-      {USE_GOOGLE_MAPS_EMBED ? (
-        <iframe
-          title="خريطة القدس من Google Maps"
-          src={embedUrl}
-          className="absolute inset-0 h-full w-full border-0"
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          allowFullScreen
-        />
-      ) : (
-        <div ref={mapContainerRef} className="w-full h-full min-h-[180px]" />
-      )}
+      <div ref={mapContainerRef} className="w-full h-full min-h-[180px]" />
 
       {/* Loading Overlay */}
       {!mapLoaded && !loadError && (
@@ -432,7 +412,7 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
       )}
 
       {/* Floating Controls Bar */}
-      {mapLoaded && !USE_GOOGLE_MAPS_EMBED && (
+      {mapLoaded && (
         <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-30 flex items-center gap-1.5 sm:gap-2">
           {/* Map Layer Switcher */}
           {showControls && <button
