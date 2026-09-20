@@ -126,7 +126,7 @@ const GameResult: React.FC<{
   title: string; message: string; points: number; alreadyCompleted: boolean; rewardGranted?: boolean;
   onRestart: () => void; onBack: () => void; failed?: boolean;
 }> = ({ title, message, points, alreadyCompleted, rewardGranted, onRestart, onBack, failed = false }) => (
-  <section className="max-w-xl mx-auto text-center rounded-3xl border border-[#3C2975] bg-[#160E36] px-6 py-10 shadow-2xl shadow-black/20">
+  <section className="sira-game-panel max-w-xl mx-auto text-center rounded-3xl border border-[#3C2975] bg-[#160E36] px-6 py-10 shadow-2xl shadow-black/20">
     <div className={`w-20 h-20 mx-auto rounded-full grid place-items-center ${failed ? 'bg-[#EF4444]/10 text-[#F87171]' : 'bg-[#E5C158]/10 text-[#E5C158]'}`}>{failed ? <Shield className="w-10 h-10" /> : <Trophy className="w-10 h-10" />}</div>
     <span className="block text-xs text-[#D4AF37] mt-6">{failed ? 'انتهت المحاولة' : 'اكتمل التحدي'}</span>
     <h2 className="font-serif-ar text-3xl font-bold mt-2">{title}</h2>
@@ -204,7 +204,7 @@ const BlitzGame: React.FC<GameBaseProps> = ({ alreadyCompleted, rewardGranted, o
         <div className="flex gap-4"><span className="text-[#FF9F43] inline-flex gap-1"><Flame className="w-4 h-4" /> سلسلة {streak}</span><span className="text-[#E5C158] font-num">{score} نقطة</span></div>
       </div>
       <div className="h-2 rounded-full bg-[#251850] overflow-hidden mb-7"><div className="h-full bg-gradient-to-l from-[#E5C158] to-[#FF9F43] transition-all" style={{ width: `${((index + 1) / questions.length) * 100}%` }} /></div>
-      <div className="rounded-3xl border border-[#3C2975] bg-[#160E36] overflow-hidden">
+      <div className="sira-game-panel rounded-3xl border border-[#3C2975] bg-[#160E36] overflow-hidden">
         <div className="p-6 sm:p-9 border-b border-[#2B1E55]"><span className="text-[10px] rounded-full bg-[#E5C158]/10 text-[#E5C158] px-3 py-1">{question.category}</span><h2 className="font-serif-ar text-2xl sm:text-3xl font-bold leading-relaxed mt-4">{question.question}</h2></div>
         <div className="p-5 sm:p-6 grid sm:grid-cols-2 gap-3">
           {question.options.map((option, optionIndex) => {
@@ -214,7 +214,7 @@ const BlitzGame: React.FC<GameBaseProps> = ({ alreadyCompleted, rewardGranted, o
           })}
         </div>
       </div>
-      {selected !== null && <div className="mt-4 rounded-2xl border border-[#D4AF37]/30 bg-[#1B123B] p-5 flex flex-col sm:flex-row sm:items-center gap-4"><Lightbulb className="w-5 h-5 text-[#E5C158] shrink-0" /><p className="text-sm leading-relaxed text-[#D8CDE8] flex-1">{question.fact}</p><button onClick={next} className="rounded-xl bg-[#E5C158] text-[#110B29] px-5 py-2.5 text-xs font-bold shrink-0">{index === questions.length - 1 || hearts === 0 ? 'شاهد النتيجة' : 'السؤال التالي'}</button></div>}
+      {selected !== null && <div className="sira-game-panel mt-4 rounded-2xl border border-[#D4AF37]/30 bg-[#1B123B] p-5 flex flex-col sm:flex-row sm:items-center gap-4"><Lightbulb className="w-5 h-5 text-[#E5C158] shrink-0" /><p className="text-sm leading-relaxed text-[#D8CDE8] flex-1">{question.fact}</p><button onClick={next} className="rounded-xl bg-[#E5C158] text-[#110B29] px-5 py-2.5 text-xs font-bold shrink-0">{index === questions.length - 1 || hearts === 0 ? 'شاهد النتيجة' : 'السؤال التالي'}</button></div>}
     </section>
   </>;
 };
@@ -256,7 +256,7 @@ const MemoryGame: React.FC<GameBaseProps> = ({ alreadyCompleted, rewardGranted, 
       <div className="grid grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-4 [perspective:1000px]">
         {cards.map((card, cardIndex) => {
           const visible = open.includes(cardIndex) || matched.includes(card.pairId); const done = matched.includes(card.pairId);
-          return <button key={card.uid} onClick={() => reveal(cardIndex)} disabled={done} aria-label={visible ? card.text : 'بطاقة مخفية'} className={`relative min-h-32 sm:min-h-40 rounded-2xl border p-3 transition-all duration-300 overflow-hidden ${visible ? done ? 'border-[#22C55E]/60 bg-[#123E28]' : 'border-[#E5C158] bg-[#21164A]' : 'border-[#3C2975] bg-gradient-to-br from-[#251850] to-[#130C30] hover:-translate-y-1 hover:border-[#E5C158]'}`}>{visible ? <div className="h-full flex flex-col items-center justify-center gap-3"><span className="text-2xl">{card.icon}</span><strong className={`leading-relaxed ${card.kind === 'clue' ? 'text-[11px] sm:text-sm text-[#D8CDE8]' : 'text-sm sm:text-lg'}`}>{card.text}</strong>{done && <CheckCircle2 className="w-4 h-4 text-[#4ADE80]" />}</div> : <div className="absolute inset-0 grid place-items-center"><span className="font-serif-ar text-4xl text-[#E5C158]/80">س</span><span className="absolute inset-3 border border-[#E5C158]/10 rounded-xl" /></div>}</button>;
+          return <button key={card.uid} onClick={() => reveal(cardIndex)} disabled={done} aria-label={visible ? card.text : 'بطاقة مخفية'} className={`sira-game-panel relative min-h-32 sm:min-h-40 rounded-2xl border p-3 transition-all duration-300 overflow-hidden ${visible ? done ? 'border-[#22C55E]/60 bg-[#123E28]' : 'border-[#E5C158] bg-[#21164A]' : 'border-[#3C2975] bg-gradient-to-br from-[#251850] to-[#130C30] hover:-translate-y-1 hover:border-[#E5C158]'}`}>{visible ? <div className="h-full flex flex-col items-center justify-center gap-3"><span className="text-2xl">{card.icon}</span><strong className={`leading-relaxed ${card.kind === 'clue' ? 'text-[11px] sm:text-sm text-[#D8CDE8]' : 'text-sm sm:text-lg'}`}>{card.text}</strong>{done && <CheckCircle2 className="w-4 h-4 text-[#4ADE80]" />}</div> : <div className="absolute inset-0 grid place-items-center"><span className="font-serif-ar text-4xl text-[#E5C158]/80">س</span><span className="absolute inset-3 border border-[#E5C158]/10 rounded-xl" /></div>}</button>;
         })}
       </div>
     </section>
@@ -285,7 +285,7 @@ const TimelineGame: React.FC<GameBaseProps> = ({ alreadyCompleted, rewardGranted
     <section className="max-w-3xl mx-auto">
       <div className="rounded-2xl border border-[#D4AF37]/20 bg-[#E5C158]/5 p-4 text-sm text-[#D8CDE8] mb-5"><Clock3 className="inline w-4 h-4 text-[#E5C158] ml-2" />رتّب الأحداث من الأقدم في الأعلى إلى الأحدث في الأسفل.</div>
       <div className="space-y-3">{events.map((event, eventIndex) =>
-        <div key={event.id} className={`grid grid-cols-[auto_1fr_auto] gap-4 items-center rounded-2xl border bg-[#160E36] p-4 sm:p-5 ${feedback === 'wrong' && event.id !== TIMELINE_EVENTS[eventIndex].id ? 'border-[#EF4444]/50' : 'border-[#3C2975]'}`}>
+        <div key={event.id} className={`sira-game-panel grid grid-cols-[auto_1fr_auto] gap-4 items-center rounded-2xl border bg-[#160E36] p-4 sm:p-5 ${feedback === 'wrong' && event.id !== TIMELINE_EVENTS[eventIndex].id ? 'border-[#EF4444]/50' : 'border-[#3C2975]'}`}>
           <span className="font-num text-2xl text-[#E5C158] w-8">{String(eventIndex + 1).padStart(2, '0')}</span>
           <div><span className="text-xs text-[#D4AF37]">{event.year}</span><h3 className="font-bold text-base sm:text-lg mt-1">{event.title}</h3><p className="text-xs text-[#A89CB9] mt-1 hidden sm:block">{event.note}</p></div>
           <div className="flex flex-col gap-1"><button onClick={() => move(eventIndex, -1)} disabled={eventIndex === 0} aria-label={`حرّك ${event.title} للأعلى`} className="w-9 h-9 rounded-lg border border-[#4B3689] grid place-items-center disabled:opacity-20 hover:border-[#E5C158]"><ChevronUp className="w-4 h-4" /></button><button onClick={() => move(eventIndex, 1)} disabled={eventIndex === events.length - 1} aria-label={`حرّك ${event.title} للأسفل`} className="w-9 h-9 rounded-lg border border-[#4B3689] grid place-items-center disabled:opacity-20 hover:border-[#E5C158]"><ChevronDown className="w-4 h-4" /></button></div>
@@ -312,7 +312,7 @@ const CompassGame: React.FC<GameBaseProps> = ({ alreadyCompleted, rewardGranted,
   return <>
     <GameTopBar title="بوصلة الأبواب" onBack={onBack}><span className="font-num text-[#E5C158] text-sm">{score} نقطة</span></GameTopBar>
     <section className="max-w-4xl mx-auto grid lg:grid-cols-[1.2fr_0.8fr] gap-6 items-stretch">
-      <div className="relative min-h-[430px] sm:min-h-[520px] rounded-[2.5rem] border-2 border-[#8B6F2F] bg-[#171033] overflow-hidden shadow-2xl">
+      <div className="sira-game-panel relative min-h-[430px] sm:min-h-[520px] rounded-[2.5rem] border-2 border-[#8B6F2F] bg-[#171033] overflow-hidden shadow-2xl">
         <div className="absolute inset-8 sm:inset-14 rounded-[35%_45%_38%_42%] border-4 border-[#D4AF37]/35 bg-[#211747] shadow-inner"><div className="absolute inset-4 rounded-[35%_45%_38%_42%] border border-dashed border-[#E5C158]/15" /><div className="absolute inset-0 grid place-items-center text-center"><div><Landmark className="w-10 h-10 text-[#E5C158]/35 mx-auto" /><span className="block text-xs text-[#8F82A3] mt-2">البلدة القديمة</span></div></div></div>
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,#E5C158_1px,transparent_1px)] [background-size:18px_18px]" />
         {DIRECTIONS.map((direction) => {
@@ -322,7 +322,7 @@ const CompassGame: React.FC<GameBaseProps> = ({ alreadyCompleted, rewardGranted,
         })}
         <Compass className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 text-[#E5C158]/8" />
       </div>
-      <div className="rounded-3xl border border-[#3C2975] bg-[#160E36] p-6 sm:p-8 flex flex-col justify-center">
+      <div className="sira-game-panel rounded-3xl border border-[#3C2975] bg-[#160E36] p-6 sm:p-8 flex flex-col justify-center">
         <span className="text-xs text-[#D4AF37]">الموقع {round + 1} من {COMPASS_QUESTIONS.length}</span><Target className="w-9 h-9 text-[#E5C158] mt-6" /><h2 className="font-serif-ar text-3xl font-bold mt-4">أين يقع {question.place}؟</h2><p className="text-sm text-[#A89CB9] leading-relaxed mt-3">اختر الجهة الأقرب لموقع الباب على سور البلدة القديمة.</p>
         {selected && <div className={`mt-6 rounded-xl border p-4 ${selected === question.direction ? 'border-[#22C55E]/50 bg-[#123E28]' : 'border-[#EF4444]/50 bg-[#401821]'}`}><strong>{selected === question.direction ? 'اتجاه صحيح!' : `الصحيح: ${DIRECTIONS.find((item) => item.id === question.direction)?.label}`}</strong><p className="text-xs leading-relaxed text-[#D8CDE8] mt-2">{question.fact}</p></div>}
         {selected && <button onClick={next} className="mt-4 rounded-xl bg-[#E5C158] text-[#110B29] py-3 font-bold">{round === COMPASS_QUESTIONS.length - 1 ? 'النتيجة' : 'الموقع التالي'}</button>}
@@ -366,7 +366,7 @@ const VaultGame: React.FC<GameBaseProps> = ({ alreadyCompleted, rewardGranted, o
   return <>
     <GameTopBar title="غرفة الهروب: خزنة المدينة" onBack={onBack}><div className="flex items-center gap-2 rounded-full bg-[#251850] px-4 py-2 text-[#FFB86B] text-xs"><Flame className="w-4 h-4 fill-current" /> {torches} مشاعل</div></GameTopBar>
     <section className="max-w-3xl mx-auto">
-      <div className="rounded-3xl border border-[#725B22] bg-gradient-to-b from-[#201641] to-[#110B29] overflow-hidden shadow-2xl">
+      <div className="sira-game-panel rounded-3xl border border-[#725B22] bg-gradient-to-b from-[#201641] to-[#110B29] overflow-hidden shadow-2xl">
         <div className="border-b border-[#3C2975] p-5 flex items-center justify-between gap-4"><div className="flex gap-2">{VAULT_RIDDLES.map((_, index) => <span key={index} className={`w-10 h-10 rounded-lg border grid place-items-center font-num ${solvedDigits[index] ? 'border-[#E5C158] bg-[#E5C158]/10 text-[#E5C158]' : 'border-[#3C2975] text-[#645777]'}`}>{solvedDigits[index] || '•'}</span>)}</div><LockKeyhole className="w-7 h-7 text-[#E5C158]" /></div>
         {stage === 'riddles' ? <div className="p-6 sm:p-10">
           <span className="text-xs text-[#D4AF37]">الغرفة {room + 1} / {VAULT_RIDDLES.length}</span><h2 className="font-serif-ar text-2xl sm:text-3xl font-bold leading-relaxed mt-4">{riddle.question}</h2>

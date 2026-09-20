@@ -432,5 +432,50 @@ section[id] { scroll-margin-top: 145px; }
 .sira-theme-light .life-chip { border-color: var(--sira-border); color: var(--sira-ink); }
 .sira-theme-light .life-route-row { background: var(--sira-paper-soft); border-color: var(--sira-border); }
 
+/* Games deliberately use dark boards and cards, even while the surrounding
+   site uses warm paper.  Keep their copy, symbols, and controls legible in
+   light mode instead of inheriting the page's dark-purple ink. */
+.sira-theme-light .sira-game-panel {
+  color: #fff9ef;
+}
+
+.sira-theme-light .sira-game-panel[class~="bg-[#0D081F]"],
+.sira-theme-light .sira-game-panel[class~="bg-[#110B29]"],
+.sira-theme-light .sira-game-panel[class~="bg-[#160E36]"] {
+  background-color: #160e36 !important;
+}
+
+.sira-theme-light .sira-game-panel [class~="bg-[#0D081F]"] { background-color: #0d081f !important; }
+.sira-theme-light .sira-game-panel [class~="bg-[#110B29]"] { background-color: #110b29 !important; }
+.sira-theme-light .sira-game-panel [class~="bg-[#160E36]"] { background-color: #160e36 !important; }
+.sira-theme-light .sira-game-panel [class~="bg-[#211537]"] { background-color: #211537 !important; }
+
+.sira-theme-light .sira-game-panel [class~="text-[#FAF8F5]"],
+.sira-theme-light .sira-game-panel [class~="text-[#F2EDF8]"],
+.sira-theme-light .sira-game-panel [class~="text-[#E2DCEB]"],
+.sira-theme-light .sira-game-panel [class~="text-[#DDD5E8]"],
+.sira-theme-light .sira-game-panel [class~="text-[#D8CDE8]"],
+.sira-theme-light .sira-game-panel [class~="text-[#D3C7E3]"],
+.sira-theme-light .sira-game-panel [class~="text-[#C4B7D8]"],
+.sira-theme-light .sira-game-panel [class~="text-[#B8ACC9]"],
+.sira-theme-light .sira-game-panel [class~="text-[#A89CB9]"],
+.sira-theme-light .sira-game-panel [class~="text-[#8E80A4]"],
+.sira-theme-light .sira-game-panel [class~="text-[#7F7296]"],
+.sira-theme-light .sira-game-panel [class~="text-[#756987]"],
+.sira-theme-light .sira-game-panel .text-white {
+  color: #fff9ef !important;
+}
+
+.sira-theme-light .sira-game-panel [class~="text-[#E5C158]"],
+.sira-theme-light .sira-game-panel [class~="text-[#D4AF37]"] {
+  color: #f3d77a !important;
+}
+
+.sira-theme-light .sira-game-panel [class~="border-[#2B1E55]"],
+.sira-theme-light .sira-game-panel [class~="border-[#3C2975]"],
+.sira-theme-light .sira-game-panel [class~="border-[#4B3689]"] {
+  border-color: #5c4794 !important;
+}
+
 .sira-theme-light ::-webkit-scrollbar-track { background: var(--sira-paper-soft); }
 .sira-theme-light ::-webkit-scrollbar-thumb { background: #8a6a45; }
