@@ -83,7 +83,7 @@ export const PlaceDetailView: React.FC<PlaceDetailViewProps> = ({
     <div className="min-h-screen bg-[#0D081F] text-[#FAF8F5] pb-24 md:pb-16 text-right">
       
       {/* CINEMATIC HERO SECTION */}
-      <section className="relative min-h-[690px] md:min-h-0 md:h-[75vh] w-full overflow-hidden flex items-end">
+      <section className="sira-image-hero relative min-h-[690px] md:min-h-0 md:h-[75vh] w-full overflow-hidden flex items-end">
         {/* Cinematic Backdrop Image */}
         <img
           src={place.coverImage}

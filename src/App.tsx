@@ -26,8 +26,19 @@ import { Heart, Sparkles, MapPin, Compass, Navigation } from 'lucide-react';
 const STATIC_ALL_ROUTES = [...JERUSALEM_ROUTES, ...LIFE_ROUTES];
 const STORAGE_KEY_PROGRESS = 'sira_discovery_progress_v1';
 const STORAGE_KEY_FAVS = 'sira_favorites_v1';
+const STORAGE_KEY_THEME = 'sira_color_theme_v1';
+type SiraTheme = 'dark' | 'light';
+
+const getInitialTheme = (): SiraTheme => {
+  try {
+    return localStorage.getItem(STORAGE_KEY_THEME) === 'light' ? 'light' : 'dark';
+  } catch {
+    return 'dark';
+  }
+};
 
 export default function App() {
+  const [theme, setTheme] = useState<SiraTheme>(getInitialTheme);
   // Current Route Path
   const [currentPath, setCurrentPath] = useState<string>(() => {
     return window.location.pathname + window.location.search + window.location.hash;
@@ -118,6 +129,15 @@ export default function App() {
     } catch (e) {}
     return ['al-aqsa-mosque', 'bab-al-amoud'];
   });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY_THEME, theme);
+    } catch { /* The visual preference remains active for this visit. */ }
+    document.documentElement.style.colorScheme = theme;
+  }, [theme]);
+
+  const toggleTheme = () => setTheme((currentTheme) => currentTheme === 'dark' ? 'light' : 'dark');
 
   // Keep progress synced to localStorage
   useEffect(() => {
@@ -312,13 +332,15 @@ export default function App() {
   };
 
   return (
-    <div dir="rtl" lang="ar" className="min-h-screen bg-[#0D081F] text-[#FAF8F5] flex flex-col selection:bg-[#E5C158] selection:text-[#110B29] font-sans antialiased">
+    <div dir="rtl" lang="ar" className={`sira-theme sira-theme-${theme} min-h-screen bg-[#0D081F] text-[#FAF8F5] flex flex-col selection:bg-[#E5C158] selection:text-[#110B29] font-sans antialiased`}>
       {/* Top Main Navigation */}
       <Navbar
         currentPath={path}
         onNavigate={navigate}
         progress={progress}
         totalPlacesCount={places.length}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {/* Main View Area */}
@@ -328,7 +350,7 @@ export default function App() {
 
       {/* Global Footer (Visible on all views except full-screen map explore & route tracking) */}
       {path !== '/explore' && !path.startsWith('/routes/') && (
-        <footer className="bg-[#090516] border-t border-[#201444] py-12 px-4 sm:px-6 lg:px-8 text-right">
+        <footer className="sira-site-footer bg-[#090516] border-t border-[#201444] py-12 px-4 sm:px-6 lg:px-8 text-right">
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
             
             {/* Col 1: Sira Identity */}

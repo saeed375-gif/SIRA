@@ -104,3 +104,180 @@ section[id] { scroll-margin-top: 145px; }
   background: transparent;
   border: 0;
 }
+
+/*
+ * Light mode follows the poster's hierarchy: warm paper carries the content,
+ * gold guides attention, and midnight purple frames the experience.  The
+ * existing interface uses Tailwind's literal colour utilities, so these
+ * deliberate overrides keep every existing screen readable without changing
+ * its layout or image treatment.
+ */
+.sira-theme-light {
+  --sira-paper: #fff9ef;
+  --sira-paper-soft: #f5ead8;
+  --sira-paper-deep: #ead8bb;
+  --sira-ink: #28163f;
+  --sira-muted: #6d5a72;
+  --sira-gold-ink: #95601a;
+  --sira-border: #d9be8e;
+  background: var(--sira-paper);
+  color: var(--sira-ink);
+  color-scheme: light;
+}
+
+.sira-theme-light main { background: var(--sira-paper); }
+.sira-theme-light ::selection { background: #d4af37; color: #28163f; }
+
+/* Main page and card surfaces. Semi-transparent overlays are intentionally
+   left purple, preserving contrast over photography and maps. */
+.sira-theme-light [class~="bg-[#0D081F]"],
+.sira-theme-light [class~="bg-[#110B29]"],
+.sira-theme-light [class~="bg-[#140E36]"],
+.sira-theme-light [class~="bg-[#160E36]"],
+.sira-theme-light [class~="bg-[#18103A]"],
+.sira-theme-light [class~="bg-[#1C123D]"],
+.sira-theme-light [class~="bg-[#1C133D]"],
+.sira-theme-light [class~="bg-[#1D1244]"],
+.sira-theme-light [class~="bg-[#1D143D]"],
+.sira-theme-light [class~="bg-[#1E1344]"],
+.sira-theme-light [class~="bg-[#1A1140]"],
+.sira-theme-light [class~="bg-[#1B1140]"],
+.sira-theme-light [class~="bg-[#1F144B]"],
+.sira-theme-light [class~="bg-[#251854]"] {
+  background-color: var(--sira-paper) !important;
+}
+
+.sira-theme-light [class~="bg-[#211537]"],
+.sira-theme-light [class~="bg-[#f2ebdf]"],
+.sira-theme-light [class~="bg-[#140E2E]/90"] {
+  background-color: var(--sira-paper-soft) !important;
+}
+
+.sira-theme-light [class~="text-[#FAF8F5]"],
+.sira-theme-light [class~="text-[#F2EDF8]"],
+.sira-theme-light [class~="text-[#E2DCEB]"],
+.sira-theme-light [class~="text-[#DDD5E8]"],
+.sira-theme-light [class~="text-[#D8CDE8]"],
+.sira-theme-light [class~="text-[#D3C7E3]"],
+.sira-theme-light [class~="text-[#C4B7D8]"],
+.sira-theme-light [class~="text-[#B8ACC9]"],
+.sira-theme-light [class~="text-[#A89CB9]"],
+.sira-theme-light [class~="text-[#8E80A4]"],
+.sira-theme-light [class~="text-[#7F7296]"],
+.sira-theme-light [class~="text-[#756987]"],
+.sira-theme-light .text-white {
+  color: var(--sira-ink) !important;
+}
+
+.sira-theme-light [class~="text-[#E5C158]"],
+.sira-theme-light [class~="text-[#D4AF37]"] {
+  color: var(--sira-gold-ink) !important;
+}
+
+.sira-theme-light [class~="border-[#261A4E]"],
+.sira-theme-light [class~="border-[#24174B]"],
+.sira-theme-light [class~="border-[#2B1E55]"],
+.sira-theme-light [class~="border-[#2F2160]"],
+.sira-theme-light [class~="border-[#3C2975]"],
+.sira-theme-light [class~="border-[#44307E]"],
+.sira-theme-light [class~="border-[#4B3689]"],
+.sira-theme-light [class~="border-[#725B22]"],
+.sira-theme-light [class~="border-[#201444]"],
+.sira-theme-light [class~="border-[#1C123D]"] {
+  border-color: var(--sira-border) !important;
+}
+
+.sira-theme-light [class~="border-white/10"],
+.sira-theme-light [class~="border-white/15"] {
+  border-color: color-mix(in srgb, var(--sira-border) 75%, transparent) !important;
+}
+
+/* Dark translucent controls always receive light copy, even in light mode. */
+.sira-theme-light [class*="bg-[#0D081F]/"] [class~="text-[#FAF8F5]"],
+.sira-theme-light [class*="bg-[#110B29]/"] [class~="text-[#FAF8F5]"],
+.sira-theme-light [class*="bg-[#140E36]/"] [class~="text-[#FAF8F5]"],
+.sira-theme-light [class*="bg-[#160E36]/"] [class~="text-[#FAF8F5]"],
+.sira-theme-light [class*="bg-[#18103A]/"] [class~="text-[#FAF8F5]"],
+.sira-theme-light [class*="bg-[#0D081F]/"] .text-white,
+.sira-theme-light [class*="bg-[#110B29]/"] .text-white,
+.sira-theme-light [class*="bg-[#140E36]/"] .text-white,
+.sira-theme-light [class*="bg-[#160E36]/"] .text-white,
+.sira-theme-light [class*="bg-[#18103A]/"] .text-white {
+  color: #fff9ef !important;
+}
+
+/* The purple frame stays intentionally dark, like the poster's top and base. */
+.sira-theme-light .sira-site-header,
+.sira-theme-light .sira-site-footer,
+.sira-theme-light .sira-mobile-nav {
+  background-color: #211238 !important;
+  border-color: #604576 !important;
+  color: #fff9ef;
+}
+
+.sira-theme-light .sira-site-header [class~="text-[#FAF8F5]"],
+.sira-theme-light .sira-site-footer [class~="text-[#FAF8F5]"],
+.sira-theme-light .sira-site-header [class~="text-[#C4B7D8]"],
+.sira-theme-light .sira-site-footer [class~="text-[#C4B7D8]"],
+.sira-theme-light .sira-site-header [class~="text-[#A89CB9]"],
+.sira-theme-light .sira-site-footer [class~="text-[#A89CB9]"],
+.sira-theme-light .sira-mobile-nav [class~="text-[#8E80A4]"] {
+  color: #f4e9da !important;
+}
+
+.sira-theme-light .sira-site-header [class~="text-[#E5C158]"],
+.sira-theme-light .sira-site-header [class~="text-[#D4AF37]"],
+.sira-theme-light .sira-site-footer [class~="text-[#E5C158]"],
+.sira-theme-light .sira-site-footer [class~="text-[#D4AF37]"],
+.sira-theme-light .sira-mobile-nav [class~="text-[#E5C158]"] {
+  color: #f3d77a !important;
+}
+
+/* Map cards and photographic heroes deliberately retain high-contrast ink. */
+.sira-theme-light .sira-map-shell {
+  background-color: #110b29 !important;
+  color: #fff9ef;
+}
+
+.sira-theme-light .sira-map-shell [class~="bg-[#160E36]"],
+.sira-theme-light .sira-map-shell [class~="bg-[#110B29]"],
+.sira-theme-light .sira-map-shell [class~="bg-[#140E36]"] {
+  background-color: #160e36 !important;
+}
+
+.sira-theme-light .sira-map-shell [class~="text-[#FAF8F5]"],
+.sira-theme-light .sira-map-shell [class~="text-[#D8CDE8]"],
+.sira-theme-light .sira-map-shell [class~="text-[#C4B7D8]"],
+.sira-theme-light .sira-map-shell [class~="text-[#A89CB9]"] {
+  color: #fff9ef !important;
+}
+
+.sira-theme-light .sira-map-shell [class~="text-[#E5C158]"],
+.sira-theme-light .sira-map-shell [class~="text-[#D4AF37]"] {
+  color: #f3d77a !important;
+}
+
+.sira-theme-light .sira-image-hero [class~="text-[#FAF8F5]"],
+.sira-theme-light .sira-image-hero [class~="text-[#F2EDF8]"],
+.sira-theme-light .sira-image-hero [class~="text-[#A89CB9]"],
+.sira-theme-light .sira-image-hero .text-white {
+  color: #fff9ef !important;
+}
+
+.sira-theme-light .sira-image-hero [class~="text-[#E5C158]"],
+.sira-theme-light .sira-image-hero [class~="text-[#D4AF37]"] {
+  color: #f3d77a !important;
+}
+
+.sira-theme-light .life-home {
+  background: radial-gradient(ellipse at 85% 0%, #d4af3740, transparent 65%), var(--sira-paper) !important;
+  border-color: var(--sira-border);
+}
+
+.sira-theme-light .life-paper { background: var(--sira-paper-soft); color: var(--sira-ink); }
+.sira-theme-light .life-button-outline { background: #211238; color: #fff9ef; border-color: #c99b45; }
+.sira-theme-light .life-chip { border-color: var(--sira-border); color: var(--sira-ink); }
+.sira-theme-light .life-route-row { background: var(--sira-paper-soft); border-color: var(--sira-border); }
+
+.sira-theme-light ::-webkit-scrollbar-track { background: var(--sira-paper-soft); }
+.sira-theme-light ::-webkit-scrollbar-thumb { background: #8a6a45; }

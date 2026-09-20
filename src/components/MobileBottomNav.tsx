@@ -21,7 +21,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#110B29]/95 backdrop-blur-xl border-t border-[#261A4E] px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
+    <div className="sira-mobile-nav md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#110B29]/95 backdrop-blur-xl border-t border-[#261A4E] px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
       <div className="flex items-center justify-around">
         {tabs.map((tab) => {
           const Icon = tab.icon;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Compass, Map, Navigation, Info, Search, Sparkles, Menu, X, Gamepad2, Languages, LoaderCircle } from 'lucide-react';
+import { Compass, Map, Navigation, Info, Search, Sparkles, Menu, X, Gamepad2, Languages, LoaderCircle, Sun, Moon } from 'lucide-react';
 import { UserDiscoveryProgress } from '../types';
 import { SiraLogo } from './SiraLogo';
 
@@ -8,6 +8,8 @@ interface NavbarProps {
   onNavigate: (path: string) => void;
   progress: UserDiscoveryProgress;
   totalPlacesCount: number;
+  theme: 'dark' | 'light';
+  onToggleTheme: () => void;
 }
 
 declare global {
@@ -69,6 +71,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onNavigate,
   progress,
   totalPlacesCount,
+  theme,
+  onToggleTheme,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [language, setLanguage] = useState<'ar' | 'en'>(() => hasEnglishTranslationCookie() ? 'en' : 'ar');
@@ -106,7 +110,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const progressPercent = Math.round((discoveredCount / totalPlacesCount) * 100) || 0;
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#110B29]/95 backdrop-blur-xl border-b border-[#261A4E] transition-all">
+    <header className="sira-site-header sticky top-0 z-40 w-full bg-[#110B29]/95 backdrop-blur-xl border-b border-[#261A4E] transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
         {/* Brand / Logo (Sira) */}
         <button
@@ -164,6 +168,19 @@ export const Navbar: React.FC<NavbarProps> = ({
         >
           {translationLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Languages className="h-4 w-4" />}
           {language === 'ar' ? <span lang="en" dir="ltr">English</span> : <span>العربية</span>}
+        </button>
+
+        <button
+          type="button"
+          id="sira-theme-toggle"
+          onClick={onToggleTheme}
+          aria-pressed={theme === 'light'}
+          title={theme === 'dark' ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن'}
+          aria-label={theme === 'dark' ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن'}
+          className="hidden md:inline-flex shrink-0 items-center gap-2 rounded-xl border border-[#3C2975] bg-[#160E36] px-3 py-2 text-xs font-bold text-[#E5C158] transition-all hover:border-[#D4AF37] hover:bg-[#251854] focus-visible:outline-2 focus-visible:outline-[#E5C158] focus-visible:outline-offset-4"
+        >
+          {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          <span>{theme === 'dark' ? 'فاتح' : 'داكن'}</span>
         </button>
 
         {/* Right side: Discovery Progress Badge & Actions */}
@@ -258,6 +275,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             {translationLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Languages className="h-4 w-4" />}
             {language === 'ar' ? <span>التحويل إلى <span lang="en" dir="ltr">English</span></span> : <span>العودة إلى العربية</span>}
+          </button>
+
+          <button
+            type="button"
+            id="sira-theme-toggle-mobile"
+            onClick={onToggleTheme}
+            aria-pressed={theme === 'light'}
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-[#3C2975] bg-[#160E36] p-3 text-sm font-bold text-[#E5C158] transition-colors hover:border-[#D4AF37] hover:bg-[#251854]"
+          >
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {theme === 'dark' ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن'}
           </button>
         </div>
       )}
