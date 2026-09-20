@@ -60,7 +60,7 @@ export function MomentView({ id, onNavigate }: { id: string } & Navigate) {
     <SourcesModal sources={story.sources} placeName={story.title} isOpen={sourcesOpen} onClose={() => setSourcesOpen(false)} />
   </div>;
 }
-export function PlaceLifeSection({ place, onNavigate, onSuccess }: { place: Place; onSuccess: (points: number) => void } & Navigate) {
+export function PlaceLifeSection({ place, onNavigate, onSuccess }: { place: Place; onSuccess: (points: number) => boolean } & Navigate) {
   const stories = storiesForPlace(place.id);
   const [category, setCategory] = useState<DailyLifeCategory | 'all'>('all');
   const [showAll, setShowAll] = useState(false);

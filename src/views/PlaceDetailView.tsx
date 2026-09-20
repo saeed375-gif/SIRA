@@ -33,7 +33,7 @@ interface PlaceDetailViewProps {
   place: Place;
   allPlaces: Place[];
   onNavigate: (path: string) => void;
-  onPlaceChallengeSuccess: (placeId: string, points: number) => void;
+  onPlaceChallengeSuccess: (placeId: string, points: number) => boolean;
   isFavorite: boolean;
   onToggleFavorite: (placeId: string) => void;
 }

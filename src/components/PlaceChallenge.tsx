@@ -6,7 +6,7 @@ import { HelpCircle, CheckCircle2, XCircle, Award, Sparkles, ArrowLeft } from 'l
 interface PlaceChallengeProps {
   challenge: Challenge;
   placeName: string;
-  onSuccess?: (points: number) => void;
+  onSuccess?: (points: number) => boolean;
   onContinueJourney?: () => void;
   nextPlaceSlug?: string;
   onNavigateToNext?: (slug: string) => void;
@@ -22,6 +22,7 @@ export const PlaceChallenge: React.FC<PlaceChallengeProps> = ({
 }) => {
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState<boolean>(false);
+  const [rewardGranted, setRewardGranted] = useState<boolean | null>(null);
   const isCorrect = selectedOptionId === challenge.correctOptionId;
 
   const handleSelect = (optionId: string) => {
@@ -42,15 +43,14 @@ export const PlaceChallenge: React.FC<PlaceChallengeProps> = ({
         // fallback
       }
 
-      if (onSuccess) {
-        onSuccess(challenge.rewardPoints);
-      }
+      setRewardGranted(onSuccess ? onSuccess(challenge.rewardPoints) : false);
     }
   };
 
   const handleReset = () => {
     setSelectedOptionId(null);
     setIsAnswered(false);
+    setRewardGranted(null);
   };
 
   return (
@@ -76,7 +76,7 @@ export const PlaceChallenge: React.FC<PlaceChallengeProps> = ({
 
         <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#110B29]/80 border border-[#D4AF37]/30 text-xs font-bold text-[#E5C158]">
           <Sparkles className="w-3.5 h-3.5" />
-          <span className="font-num">+{challenge.rewardPoints} نقطة اكتشاف</span>
+          <span className="font-num">{rewardGranted === false ? 'إنجاز جديد بلا نقاط' : `+${challenge.rewardPoints} نقطة اكتشاف`}</span>
         </div>
       </div>
 
@@ -164,7 +164,7 @@ export const PlaceChallenge: React.FC<PlaceChallengeProps> = ({
           ) : (
             <div className="text-xs font-bold text-[#E5C158] flex items-center gap-1">
               <Sparkles className="w-4 h-4" />
-              <span>{onSuccess ? 'تم تسجيل نقاط الاكتشاف في رصيدك!' : 'أحسنت الربط بين الحكاية والمكان.'}</span>
+              <span>{rewardGranted === false ? 'أتممت التحدي مجددًا — احتفال بلا نقاط جديدة.' : onSuccess ? 'تم تسجيل نقاط الاكتشاف في رصيدك!' : 'أحسنت الربط بين الحكاية والمكان.'}</span>
             </div>
           )}
 

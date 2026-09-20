@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import confetti from 'canvas-confetti';
 import {
   ArrowLeft, Brain, CheckCircle2, ChevronDown, ChevronUp, Clock3, Compass,
   Flame, Gamepad2, Heart, KeyRound, Landmark, Lightbulb, LockKeyhole,
@@ -7,23 +8,26 @@ import {
 } from 'lucide-react';
 import type { Place, Route, UserDiscoveryProgress } from '../types';
 import type { SiraUser } from '../services/auth';
+import { KidsMapGame } from '../components/KidsMapGame';
 
-type GameId = 'blitz' | 'memory' | 'timeline' | 'compass' | 'vault';
+type GameId = 'blitz' | 'memory' | 'timeline' | 'compass' | 'vault' | 'kids-map';
 
 interface GamesViewProps {
   places: Place[];
   routes: Route[];
   progress: UserDiscoveryProgress;
   onNavigate: (path: string) => void;
-  onGameComplete: (gameId: string, points: number) => void;
+  onGameComplete: (gameId: string, points: number) => boolean;
+  onKidsMapStageComplete: (stageId: string) => boolean;
   user: SiraUser;
   onSignOut: () => void;
 }
 
 interface GameBaseProps {
   alreadyCompleted: boolean;
+  rewardGranted?: boolean;
   onBack: () => void;
-  onComplete: (points: number) => void;
+  onComplete: (points: number) => boolean;
 }
 
 interface Question {
@@ -118,16 +122,17 @@ const GameTopBar: React.FC<{ title: string; onBack: () => void; children?: React
 );
 
 const GameResult: React.FC<{
-  title: string; message: string; points: number; alreadyCompleted: boolean;
+  title: string; message: string; points: number; alreadyCompleted: boolean; rewardGranted?: boolean;
   onRestart: () => void; onBack: () => void; failed?: boolean;
-}> = ({ title, message, points, alreadyCompleted, onRestart, onBack, failed = false }) => (
+}> = ({ title, message, points, alreadyCompleted, rewardGranted, onRestart, onBack, failed = false }) => (
   <section className="max-w-xl mx-auto text-center rounded-3xl border border-[#3C2975] bg-[#160E36] px-6 py-10 shadow-2xl shadow-black/20">
     <div className={`w-20 h-20 mx-auto rounded-full grid place-items-center ${failed ? 'bg-[#EF4444]/10 text-[#F87171]' : 'bg-[#E5C158]/10 text-[#E5C158]'}`}>{failed ? <Shield className="w-10 h-10" /> : <Trophy className="w-10 h-10" />}</div>
     <span className="block text-xs text-[#D4AF37] mt-6">{failed ? 'انتهت المحاولة' : 'اكتمل التحدي'}</span>
     <h2 className="font-serif-ar text-3xl font-bold mt-2">{title}</h2>
     <p className="text-sm text-[#C4B7D8] leading-relaxed mt-3">{message}</p>
-    {!failed && <div className="font-num text-4xl text-[#E5C158] mt-5">+{points}</div>}
-    {alreadyCompleted && !failed && <p className="text-[11px] text-[#8F82A3] mt-2">أفضل نتيجة محفوظة؛ نقاط الرصيد الأساسية تُحتسب مرة واحدة.</p>}
+    {!failed && rewardGranted !== false && <div className="font-num text-4xl text-[#E5C158] mt-5">+{points}</div>}
+    {!failed && rewardGranted === false && <p className="text-[11px] text-[#8F82A3] mt-4">أُنجزت اللعبة مجددًا. الاحتفال مستمر، لكن لا تُضاف نقاط عند الإعادة.</p>}
+    {alreadyCompleted && rewardGranted === undefined && !failed && <p className="text-[11px] text-[#8F82A3] mt-2">أفضل نتيجة محفوظة؛ نقاط الرصيد الأساسية تُحتسب مرة واحدة.</p>}
     <div className="flex flex-wrap justify-center gap-3 mt-8">
       <button onClick={onRestart} className="inline-flex items-center gap-2 rounded-xl border border-[#4B3689] px-5 py-3 text-sm font-bold hover:border-[#E5C158]"><RotateCcw className="w-4 h-4" /> العب مجددًا</button>
       <button onClick={onBack} className="inline-flex items-center gap-2 rounded-xl bg-[#E5C158] px-5 py-3 text-sm font-bold text-[#110B29] hover:bg-[#FFE79A]">تحدٍ آخر <ArrowLeft className="w-4 h-4" /></button>
@@ -135,7 +140,7 @@ const GameResult: React.FC<{
   </section>
 );
 
-const BlitzGame: React.FC<GameBaseProps> = ({ alreadyCompleted, onBack, onComplete }) => {
+const BlitzGame: React.FC<GameBaseProps> = ({ alreadyCompleted, rewardGranted, onBack, onComplete }) => {
   const [run, setRun] = useState(0);
   const questions = useMemo(() => shuffle(BLITZ_QUESTIONS).slice(0, 10), [run]);
   const [index, setIndex] = useState(0);
@@ -183,7 +188,7 @@ const BlitzGame: React.FC<GameBaseProps> = ({ alreadyCompleted, onBack, onComple
     setRun((value) => value + 1); setIndex(0); setSelected(null); setScore(0);
     setStreak(0); setBestStreak(0); setHearts(3); setTimeLeft(75); setFinished(false); setSubmitted(false);
   };
-  if (finished) return <GameResult title="حصاد البرق" message={`أجبت عن ${index + (selected !== null ? 1 : 0)} أسئلة، وأفضل سلسلة لك كانت ${bestStreak} إجابات متتالية.`} points={score} alreadyCompleted={alreadyCompleted} onRestart={restart} onBack={onBack} failed={score === 0} />;
+  if (finished) return <GameResult title="حصاد البرق" message={`أجبت عن ${index + (selected !== null ? 1 : 0)} أسئلة، وأفضل سلسلة لك كانت ${bestStreak} إجابات متتالية.`} points={score} alreadyCompleted={alreadyCompleted} rewardGranted={rewardGranted} onRestart={restart} onBack={onBack} failed={score === 0} />;
 
   return <>
     <GameTopBar title="برق القدس" onBack={onBack}>
@@ -215,7 +220,7 @@ const BlitzGame: React.FC<GameBaseProps> = ({ alreadyCompleted, onBack, onComple
 
 interface MemoryCard { uid: string; pairId: string; kind: 'place' | 'clue'; text: string; icon: string }
 
-const MemoryGame: React.FC<GameBaseProps> = ({ alreadyCompleted, onBack, onComplete }) => {
+const MemoryGame: React.FC<GameBaseProps> = ({ alreadyCompleted, rewardGranted, onBack, onComplete }) => {
   const makeCards = () => shuffle(MEMORY_PAIRS.flatMap((pair) => [
     { uid: `${pair.id}-place`, pairId: pair.id, kind: 'place' as const, text: pair.place, icon: pair.icon },
     { uid: `${pair.id}-clue`, pairId: pair.id, kind: 'clue' as const, text: pair.clue, icon: '؟' },
@@ -242,7 +247,7 @@ const MemoryGame: React.FC<GameBaseProps> = ({ alreadyCompleted, onBack, onCompl
     } else window.setTimeout(() => setOpen([]), 850);
   };
   const restart = () => { setCards(makeCards()); setOpen([]); setMatched([]); setMoves(0); setFinished(false); setPoints(0); };
-  if (finished) return <GameResult title="ذاكرة مقدسية" message={`طابقت الأزواج الستة في ${moves} محاولات. كلما قلّ العدد ارتفعت جائزتك.`} points={points} alreadyCompleted={alreadyCompleted} onRestart={restart} onBack={onBack} />;
+  if (finished) return <GameResult title="ذاكرة مقدسية" message={`طابقت الأزواج الستة في ${moves} محاولات. كلما قلّ العدد ارتفعت جائزتك.`} points={points} alreadyCompleted={alreadyCompleted} rewardGranted={rewardGranted} onRestart={restart} onBack={onBack} />;
   return <>
     <GameTopBar title="متاهة الذاكرة" onBack={onBack}><div className="flex gap-3 text-xs"><span className="rounded-full bg-[#251850] px-4 py-2 text-[#E5C158]">{matched.length} / {MEMORY_PAIRS.length} أزواج</span><span className="rounded-full bg-[#251850] px-4 py-2">{moves} محاولات</span></div></GameTopBar>
     <section className="max-w-4xl mx-auto">
@@ -257,7 +262,7 @@ const MemoryGame: React.FC<GameBaseProps> = ({ alreadyCompleted, onBack, onCompl
   </>;
 };
 
-const TimelineGame: React.FC<GameBaseProps> = ({ alreadyCompleted, onBack, onComplete }) => {
+const TimelineGame: React.FC<GameBaseProps> = ({ alreadyCompleted, rewardGranted, onBack, onComplete }) => {
   const [events, setEvents] = useState(() => shuffle(TIMELINE_EVENTS));
   const [attempts, setAttempts] = useState(0);
   const [feedback, setFeedback] = useState<'wrong' | 'correct' | null>(null);
@@ -273,7 +278,7 @@ const TimelineGame: React.FC<GameBaseProps> = ({ alreadyCompleted, onBack, onCom
     else setFeedback('wrong');
   };
   const restart = () => { setEvents(shuffle(TIMELINE_EVENTS)); setAttempts(0); setFeedback(null); setPoints(0); };
-  if (feedback === 'correct') return <GameResult title="حارس الزمن" message={`أعدت خمسة أحداث إلى مواضعها في ${attempts} محاولة.`} points={points} alreadyCompleted={alreadyCompleted} onRestart={restart} onBack={onBack} />;
+  if (feedback === 'correct') return <GameResult title="حارس الزمن" message={`أعدت خمسة أحداث إلى مواضعها في ${attempts} محاولة.`} points={points} alreadyCompleted={alreadyCompleted} rewardGranted={rewardGranted} onRestart={restart} onBack={onBack} />;
   return <>
     <GameTopBar title="خطّ الزمن المبعثر" onBack={onBack}><span className="rounded-full bg-[#251850] px-4 py-2 text-xs">المحاولة {attempts + 1}</span></GameTopBar>
     <section className="max-w-3xl mx-auto">
@@ -290,7 +295,7 @@ const TimelineGame: React.FC<GameBaseProps> = ({ alreadyCompleted, onBack, onCom
   </>;
 };
 
-const CompassGame: React.FC<GameBaseProps> = ({ alreadyCompleted, onBack, onComplete }) => {
+const CompassGame: React.FC<GameBaseProps> = ({ alreadyCompleted, rewardGranted, onBack, onComplete }) => {
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [score, setScore] = useState(0);
@@ -302,7 +307,7 @@ const CompassGame: React.FC<GameBaseProps> = ({ alreadyCompleted, onBack, onComp
     else { setRound((value) => value + 1); setSelected(null); }
   };
   const restart = () => { setRound(0); setSelected(null); setScore(0); setFinished(false); };
-  if (finished) return <GameResult title="بوصلة القدس" message={`حددت الاتجاه الصحيح في ${score / 15} من ${COMPASS_QUESTIONS.length} مواقع.`} points={score} alreadyCompleted={alreadyCompleted} onRestart={restart} onBack={onBack} />;
+  if (finished) return <GameResult title="بوصلة القدس" message={`حددت الاتجاه الصحيح في ${score / 15} من ${COMPASS_QUESTIONS.length} مواقع.`} points={score} alreadyCompleted={alreadyCompleted} rewardGranted={rewardGranted} onRestart={restart} onBack={onBack} />;
   return <>
     <GameTopBar title="بوصلة الأبواب" onBack={onBack}><span className="font-num text-[#E5C158] text-sm">{score} نقطة</span></GameTopBar>
     <section className="max-w-4xl mx-auto grid lg:grid-cols-[1.2fr_0.8fr] gap-6 items-stretch">
@@ -325,7 +330,7 @@ const CompassGame: React.FC<GameBaseProps> = ({ alreadyCompleted, onBack, onComp
   </>;
 };
 
-const VaultGame: React.FC<GameBaseProps> = ({ alreadyCompleted, onBack, onComplete }) => {
+const VaultGame: React.FC<GameBaseProps> = ({ alreadyCompleted, rewardGranted, onBack, onComplete }) => {
   const [room, setRoom] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [solvedDigits, setSolvedDigits] = useState<string[]>([]);
@@ -355,8 +360,8 @@ const VaultGame: React.FC<GameBaseProps> = ({ alreadyCompleted, onBack, onComple
     } else { setEntered(''); setCodeError(true); setWrongs((value) => value + 1); }
   };
   const restart = () => { setRoom(0); setSelected(null); setSolvedDigits([]); setTorches(3); setWrongs(0); setStage('riddles'); setEntered(''); setCodeError(false); setPoints(0); };
-  if (stage === 'won') return <GameResult title="فُتح أرشيف القدس" message="حللت الألغاز الأربعة، حفظت الأرقام، وفتحت الخزنة بالشفرة الصحيحة." points={points} alreadyCompleted={alreadyCompleted} onRestart={restart} onBack={onBack} />;
-  if (stage === 'failed') return <GameResult title="انطفأت المشاعل" message="تحتاج إلى العودة بذاكرة أقوى. تلميحات الغرفة ستقودك إلى الشفرة في المحاولة التالية." points={0} alreadyCompleted={alreadyCompleted} onRestart={restart} onBack={onBack} failed />;
+  if (stage === 'won') return <GameResult title="فُتح أرشيف القدس" message="حللت الألغاز الأربعة، حفظت الأرقام، وفتحت الخزنة بالشفرة الصحيحة." points={points} alreadyCompleted={alreadyCompleted} rewardGranted={rewardGranted} onRestart={restart} onBack={onBack} />;
+  if (stage === 'failed') return <GameResult title="انطفأت المشاعل" message="تحتاج إلى العودة بذاكرة أقوى. تلميحات الغرفة ستقودك إلى الشفرة في المحاولة التالية." points={0} alreadyCompleted={alreadyCompleted} rewardGranted={rewardGranted} onRestart={restart} onBack={onBack} failed />;
   return <>
     <GameTopBar title="غرفة الهروب: خزنة المدينة" onBack={onBack}><div className="flex items-center gap-2 rounded-full bg-[#251850] px-4 py-2 text-[#FFB86B] text-xs"><Flame className="w-4 h-4 fill-current" /> {torches} مشاعل</div></GameTopBar>
     <section className="max-w-3xl mx-auto">
@@ -386,23 +391,48 @@ const GAME_META = [
   { id: 'timeline' as const, number: '03', icon: Clock3, title: 'خط الزمن المبعثر', eyebrow: 'ترتيب · تاريخ · منطق', description: 'خمسة أحداث من طبقات القدس اختلطت. أعدها من الأقدم إلى الأحدث دون تلميح مباشر.', duration: '4 دقائق', difficulty: 'صعب', accent: 'from-[#38BDF8]/20 to-transparent' },
   { id: 'compass' as const, number: '04', icon: MapPinned, title: 'بوصلة الأبواب', eyebrow: 'خريطة · اتجاهات · مواقع', description: 'قف في قلب البلدة القديمة وحدد موقع كل باب على السور باستخدام البوصلة.', duration: '3 دقائق', difficulty: 'صعب', accent: 'from-[#4ADE80]/20 to-transparent' },
   { id: 'vault' as const, number: '05', icon: LockKeyhole, title: 'خزنة المدينة', eyebrow: 'غرفة هروب · ألغاز · شفرة', description: 'اعبر أربع غرف، اجمع أرقام الشفرة، ثم افتح أرشيف القدس قبل انطفاء المشاعل.', duration: '5 دقائق', difficulty: 'خبير', accent: 'from-[#F472B6]/20 to-transparent' },
+  { id: 'kids-map' as const, number: '06', icon: MapPinned, title: 'مفاتيح القدس الصغيرة', eyebrow: 'لعبة أطفال · خريطة · أربع مراحل', description: 'رحلة مرسومة على خريطة القدس. اربح مفتاح كل محطة لتضيء الطريق إلى المحطة التالية.', duration: '4 مراحل', difficulty: 'للأطفال', accent: 'from-[#E5C158]/25 to-transparent' },
 ];
 
-export const GamesView: React.FC<GamesViewProps> = ({ progress, onNavigate, onGameComplete, user, onSignOut }) => {
+const celebrateGame = () => {
+  try {
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      confetti({ particleCount: 105, spread: 80, origin: { y: 0.72 }, colors: ['#D4AF37', '#E5C158', '#FFF9EF', '#8A68D6'] });
+    }
+  } catch { /* Celebration is optional. */ }
+};
+
+export const GamesView: React.FC<GamesViewProps> = ({ places, progress, onNavigate, onGameComplete, onKidsMapStageComplete, user, onSignOut }) => {
   const [activeGame, setActiveGame] = useState<GameId | null>(null);
+  const [runRewards, setRunRewards] = useState<Partial<Record<GameId, boolean>>>({});
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [activeGame]);
   const gameKey = (id: GameId) => `game:${id}-v2`;
   const completed = (id: GameId) => progress.completedChallenges.includes(gameKey(id));
-  const finish = (id: GameId, points: number) => { if (points > 0) onGameComplete(gameKey(id), points); };
+  const startGame = (id: GameId) => {
+    setRunRewards((previous) => {
+      const next = { ...previous };
+      delete next[id];
+      return next;
+    });
+    setActiveGame(id);
+  };
+  const finish = (id: GameId, points: number) => {
+    if (points <= 0) return false;
+    const granted = onGameComplete(gameKey(id), points);
+    setRunRewards((previous) => ({ ...previous, [id]: granted }));
+    celebrateGame();
+    return granted;
+  };
   const back = () => setActiveGame(null);
   const shell = (content: React.ReactNode) => <div className="min-h-screen bg-[#0D081F] text-[#FAF8F5] px-4 sm:px-6 py-8 sm:py-10 pb-28 text-right">{content}</div>;
-  if (activeGame === 'blitz') return shell(<BlitzGame alreadyCompleted={completed('blitz')} onBack={back} onComplete={(points) => finish('blitz', points)} />);
-  if (activeGame === 'memory') return shell(<MemoryGame alreadyCompleted={completed('memory')} onBack={back} onComplete={(points) => finish('memory', points)} />);
-  if (activeGame === 'timeline') return shell(<TimelineGame alreadyCompleted={completed('timeline')} onBack={back} onComplete={(points) => finish('timeline', points)} />);
-  if (activeGame === 'compass') return shell(<CompassGame alreadyCompleted={completed('compass')} onBack={back} onComplete={(points) => finish('compass', points)} />);
-  if (activeGame === 'vault') return shell(<VaultGame alreadyCompleted={completed('vault')} onBack={back} onComplete={(points) => finish('vault', points)} />);
+  if (activeGame === 'blitz') return shell(<BlitzGame alreadyCompleted={completed('blitz')} rewardGranted={runRewards.blitz} onBack={back} onComplete={(points) => finish('blitz', points)} />);
+  if (activeGame === 'memory') return shell(<MemoryGame alreadyCompleted={completed('memory')} rewardGranted={runRewards.memory} onBack={back} onComplete={(points) => finish('memory', points)} />);
+  if (activeGame === 'timeline') return shell(<TimelineGame alreadyCompleted={completed('timeline')} rewardGranted={runRewards.timeline} onBack={back} onComplete={(points) => finish('timeline', points)} />);
+  if (activeGame === 'compass') return shell(<CompassGame alreadyCompleted={completed('compass')} rewardGranted={runRewards.compass} onBack={back} onComplete={(points) => finish('compass', points)} />);
+  if (activeGame === 'vault') return shell(<VaultGame alreadyCompleted={completed('vault')} rewardGranted={runRewards.vault} onBack={back} onComplete={(points) => finish('vault', points)} />);
+  if (activeGame === 'kids-map') return <KidsMapGame places={places} progress={progress} alreadyCompleted={completed('kids-map')} onBack={back} onCompleteGame={(points) => finish('kids-map', points)} onCompleteStage={onKidsMapStageComplete} />;
 
   const completedCount = GAME_META.filter((game) => completed(game.id)).length;
   return <div className="min-h-screen bg-[#0D081F] text-[#FAF8F5] pb-28 text-right">
@@ -421,7 +451,8 @@ export const GamesView: React.FC<GamesViewProps> = ({ progress, onNavigate, onGa
             <div className="flex items-center justify-between"><span className="text-xs text-[#A89CB9]">تقدم الموسم</span><Trophy className="w-5 h-5 text-[#E5C158]" /></div>
             <div className="flex items-end gap-2 mt-3"><strong className="font-num text-4xl text-[#E5C158]">{completedCount}</strong><span className="text-sm text-[#A89CB9] mb-1">/ {GAME_META.length} ألعاب</span></div>
             <div className="h-2 rounded-full bg-[#251850] mt-4 overflow-hidden"><div className="h-full bg-gradient-to-l from-[#E5C158] to-[#FF9F43] transition-all" style={{ width: `${(completedCount / GAME_META.length) * 100}%` }} /></div>
-            <div className="flex items-center justify-between mt-4 text-xs"><span>رصيدك</span><strong className="font-num text-[#E5C158]">{progress.totalPoints} نقطة</strong></div>
+            <div className="flex items-center justify-between mt-4 text-xs"><span>رصيد المنصة</span><strong className="font-num text-[#E5C158]">{progress.totalPoints} نقطة</strong></div>
+            <div className="flex items-center justify-between mt-2 text-xs"><span>رصيد الألعاب</span><strong className="font-num text-[#E5C158]">{progress.gamePoints || 0} / 250</strong></div>
           </div>
         </div>
       </div>
@@ -430,15 +461,15 @@ export const GamesView: React.FC<GamesViewProps> = ({ progress, onNavigate, onGa
       <section className="rounded-3xl border border-[#725B22] bg-gradient-to-l from-[#24183F] to-[#160E36] p-5 sm:p-7 mb-8 flex flex-col sm:flex-row sm:items-center gap-5">
         <div className="w-14 h-14 rounded-2xl bg-[#E5C158] text-[#110B29] grid place-items-center shrink-0"><Zap className="w-7 h-7 fill-current" /></div>
         <div className="flex-1"><span className="text-[10px] text-[#E5C158] tracking-[0.25em]">تحدي اليوم</span><h2 className="font-serif-ar text-2xl font-bold mt-1">سلسلة من خمس إجابات في برق القدس</h2><p className="text-xs text-[#A89CB9] mt-1">اختر بسرعة؛ كل إجابة متتالية تمنحك مضاعف نقاط أعلى.</p></div>
-        <button onClick={() => setActiveGame('blitz')} className="rounded-xl bg-[#E5C158] px-6 py-3 text-sm font-bold text-[#110B29] hover:bg-[#FFE79A] shrink-0">ابدأ التحدي</button>
+        <button onClick={() => startGame('blitz')} className="rounded-xl bg-[#E5C158] px-6 py-3 text-sm font-bold text-[#110B29] hover:bg-[#FFE79A] shrink-0">ابدأ التحدي</button>
       </section>
-      <div className="flex items-end justify-between gap-4 mb-5"><div><span className="text-xs text-[#D4AF37]">اختر ساحتك</span><h2 className="font-serif-ar text-3xl font-bold mt-1">خمس طرق لاختبار معرفتك</h2></div><span className="hidden sm:block text-xs text-[#756987]">المحتوى يتجدد عند إعادة اللعب</span></div>
+      <div className="flex items-end justify-between gap-4 mb-5"><div><span className="text-xs text-[#D4AF37]">اختر ساحتك</span><h2 className="font-serif-ar text-3xl font-bold mt-1">ست طرق لاختبار معرفتك</h2></div><span className="hidden sm:block text-xs text-[#756987]">المحتوى يتجدد عند إعادة اللعب</span></div>
       <div className="grid md:grid-cols-2 gap-5">
         {GAME_META.map((game, index) => {
-          const Icon = game.icon; const isDone = completed(game.id);
-          return <button key={game.id} onClick={() => setActiveGame(game.id)} className={`group relative text-right min-h-72 overflow-hidden rounded-3xl border bg-[#160E36] p-6 sm:p-7 transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/20 ${index === 0 ? 'md:col-span-2' : ''} ${isDone ? 'border-[#22C55E]/45' : 'border-[#2B1E55] hover:border-[#D4AF37]'}`}>
+          const Icon = game.icon; const isDone = completed(game.id); const isKidsMapLocked = game.id === 'kids-map' && (progress.gamePoints || 0) < 250 && !isDone;
+          return <button key={game.id} onClick={() => startGame(game.id)} className={`group relative text-right min-h-72 overflow-hidden rounded-3xl border bg-[#160E36] p-6 sm:p-7 transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/20 ${index === 0 ? 'md:col-span-2' : ''} ${isDone ? 'border-[#22C55E]/45' : isKidsMapLocked ? 'border-[#725B22]/70' : 'border-[#2B1E55] hover:border-[#D4AF37]'}`}>
             <div className={`absolute inset-0 bg-gradient-to-bl ${game.accent} opacity-70`} />
-            <div className="relative h-full flex flex-col"><div className="flex items-start justify-between gap-4"><span className="font-num text-5xl text-white/10">{game.number}</span><div className="w-12 h-12 rounded-2xl border border-white/10 bg-white/5 grid place-items-center"><Icon className="w-6 h-6 text-[#E5C158]" /></div></div><span className="text-[10px] text-[#D4AF37] tracking-wider mt-5">{game.eyebrow}</span><h3 className={`font-serif-ar font-bold mt-2 group-hover:text-[#E5C158] transition-colors ${index === 0 ? 'text-3xl' : 'text-2xl'}`}>{game.title}</h3><p className="text-sm text-[#B8ACC9] leading-relaxed mt-3 max-w-2xl flex-1">{game.description}</p><div className="flex flex-wrap items-center gap-2 mt-6 pt-4 border-t border-white/10 text-[11px]"><span className="rounded-full bg-white/5 px-3 py-1.5 inline-flex gap-1"><Clock3 className="w-3.5 h-3.5" /> {game.duration}</span><span className="rounded-full bg-white/5 px-3 py-1.5">{game.difficulty}</span><span className={`mr-auto font-bold ${isDone ? 'text-[#4ADE80]' : 'text-[#E5C158]'}`}>{isDone ? 'أُنجزت ✓' : 'ادخل اللعبة ←'}</span></div></div>
+            <div className="relative h-full flex flex-col"><div className="flex items-start justify-between gap-4"><span className="font-num text-5xl text-white/10">{game.number}</span><div className="w-12 h-12 rounded-2xl border border-white/10 bg-white/5 grid place-items-center">{isKidsMapLocked ? <LockKeyhole className="w-6 h-6 text-[#E5C158]" /> : <Icon className="w-6 h-6 text-[#E5C158]" />}</div></div><span className="text-[10px] text-[#D4AF37] tracking-wider mt-5">{game.eyebrow}</span><h3 className={`font-serif-ar font-bold mt-2 group-hover:text-[#E5C158] transition-colors ${index === 0 ? 'text-3xl' : 'text-2xl'}`}>{game.title}</h3><p className="text-sm text-[#B8ACC9] leading-relaxed mt-3 max-w-2xl flex-1">{game.description}</p><div className="flex flex-wrap items-center gap-2 mt-6 pt-4 border-t border-white/10 text-[11px]"><span className="rounded-full bg-white/5 px-3 py-1.5 inline-flex gap-1"><Clock3 className="w-3.5 h-3.5" /> {game.duration}</span><span className="rounded-full bg-white/5 px-3 py-1.5">{game.difficulty}</span><span className={`mr-auto font-bold ${isDone ? 'text-[#4ADE80]' : 'text-[#E5C158]'}`}>{isDone ? 'أُنجزت ✓' : isKidsMapLocked ? `تُفتح عند 250 نقطة (${progress.gamePoints || 0}/250)` : 'ادخل اللعبة ←'}</span></div></div>
           </button>;
         })}
       </div>

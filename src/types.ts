@@ -128,6 +128,13 @@ export interface UserDiscoveryProgress {
   completedChallenges: string[];
   totalPoints: number;
   favoritePlaceIds: string[];
+  /** Points earned from full games only; used to unlock the children's map adventure. */
+  gamePoints?: number;
+  /** Progress inside the four-stage children's map adventure. */
+  kidsMapGame?: {
+    completedStageIds: string[];
+    stagePoints: number;
+  };
 }
 
 

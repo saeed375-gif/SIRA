@@ -27,6 +27,7 @@ const STATIC_ALL_ROUTES = [...JERUSALEM_ROUTES, ...LIFE_ROUTES];
 const STORAGE_KEY_PROGRESS = 'sira_discovery_progress_v1';
 const STORAGE_KEY_FAVS = 'sira_favorites_v1';
 const STORAGE_KEY_THEME = 'sira_color_theme_v1';
+const KIDS_MAP_STAGE_PREFIX = 'kids-map-stage:';
 type SiraTheme = 'dark' | 'light';
 
 const getInitialTheme = (): SiraTheme => {
@@ -111,13 +112,25 @@ export default function App() {
   const [progress, setProgress] = useState<UserDiscoveryProgress>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY_PROGRESS);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved) as UserDiscoveryProgress;
+        // Old local progress did not distinguish game points. Preserve the
+        // player's completed games as a fair minimum credit after upgrading.
+        const legacyGames = (parsed.completedChallenges || []).filter((id) => id.startsWith('game:')).length;
+        return {
+          ...parsed,
+          gamePoints: typeof parsed.gamePoints === 'number' ? parsed.gamePoints : legacyGames * 50,
+          kidsMapGame: parsed.kidsMapGame || { completedStageIds: [], stagePoints: 0 },
+        };
+      }
     } catch (e) {}
     return {
       totalPoints: 50,
       discoveredPlaceIds: ['bab-al-amoud'], // Bab al-Amoud discovered by default
       completedChallenges: [],
       favoritePlaceIds: [],
+      gamePoints: 0,
+      kidsMapGame: { completedStageIds: [], stagePoints: 0 },
     };
   });
 
@@ -190,6 +203,7 @@ export default function App() {
 
   // Challenge Completion Handler
   const handlePlaceChallengeSuccess = (placeId: string, points: number) => {
+    if ((progress.completedChallenges || []).includes(placeId)) return false;
     setProgress((prev) => {
       if ((prev.completedChallenges || []).includes(placeId)) {
         return prev;
@@ -203,6 +217,41 @@ export default function App() {
           : [...prev.discoveredPlaceIds, placeId],
       };
     });
+    return true;
+  };
+
+  // Full games contribute to both the overall discovery balance and the
+  // separate balance that unlocks the children's map adventure.
+  const handleGameComplete = (gameId: string, points: number) => {
+    if ((progress.completedChallenges || []).includes(gameId)) return false;
+    setProgress((prev) => {
+      if ((prev.completedChallenges || []).includes(gameId)) return prev;
+      return {
+        ...prev,
+        totalPoints: prev.totalPoints + points,
+        gamePoints: (prev.gamePoints || 0) + points,
+        completedChallenges: [...(prev.completedChallenges || []), gameId],
+      };
+    });
+    return true;
+  };
+
+  const handleKidsMapStageComplete = (stageId: string) => {
+    const stageKey = `${KIDS_MAP_STAGE_PREFIX}${stageId}`;
+    if ((progress.completedChallenges || []).includes(stageKey)) return false;
+    setProgress((prev) => {
+      if ((prev.completedChallenges || []).includes(stageKey)) return prev;
+      const kidsMapGame = prev.kidsMapGame || { completedStageIds: [], stagePoints: 0 };
+      return {
+        ...prev,
+        completedChallenges: [...(prev.completedChallenges || []), stageKey],
+        kidsMapGame: {
+          completedStageIds: [...kidsMapGame.completedStageIds, stageId],
+          stagePoints: kidsMapGame.stagePoints + 50,
+        },
+      };
+    });
+    return true;
   };
 
   // Mark place as discovered on visit
@@ -293,7 +342,8 @@ export default function App() {
           routes={routes}
           progress={progress}
           onNavigate={navigate}
-          onGameComplete={handlePlaceChallengeSuccess}
+          onGameComplete={handleGameComplete}
+          onKidsMapStageComplete={handleKidsMapStageComplete}
           user={gameSession.user}
           onSignOut={handleGameSignOut}
         />

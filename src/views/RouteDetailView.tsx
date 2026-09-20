@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 interface RouteDetailViewProps {
-  onChallengeSuccess: (id: string, points: number) => void;
+  onChallengeSuccess: (id: string, points: number) => boolean;
   route: Route;
   places: Place[];
   onNavigate: (path: string) => void;
