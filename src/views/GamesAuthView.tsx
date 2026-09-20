@@ -9,7 +9,7 @@ import {
   type SiraSession,
 } from '../services/auth';
 
-type AuthMode = 'login' | 'signup' | 'signup-otp' | 'forgot' | 'recovery-otp' | 'new-password' | 'password-success';
+type AuthMode = 'login' | 'signup' | 'signup-email' | 'forgot' | 'recovery-otp' | 'new-password' | 'password-success';
 
 interface GamesAuthViewProps {
   onAuthenticated: (session: SiraSession) => void;
@@ -122,8 +122,8 @@ export const GamesAuthView: React.FC<GamesAuthViewProps> = ({ onAuthenticated, o
       if ('accessToken' in result) return onAuthenticated(result);
       setEmail(result.email);
       setResendIn(45);
-      setNotice('أرسلنا رمز تحقق من 6 أرقام إلى بريدك الإلكتروني.');
-      setMode('signup-otp');
+      setNotice('أرسلنا رابط تأكيد إلى بريدك الإلكتروني.');
+      setMode('signup-email');
     } catch (requestError) {
       setError(friendlyError(requestError));
     } finally { setPending(false); }
@@ -147,7 +147,7 @@ export const GamesAuthView: React.FC<GamesAuthViewProps> = ({ onAuthenticated, o
     if (resendIn > 0 || pending) return;
     resetMessages(); setPending(true);
     try {
-      const response = mode === 'signup-otp'
+      const response = mode === 'signup-email'
         ? await resendSiraSignupOtp(email)
         : await requestSiraPasswordRecovery(email);
       setNotice(response.message);
@@ -203,6 +203,33 @@ export const GamesAuthView: React.FC<GamesAuthViewProps> = ({ onAuthenticated, o
     </div>
   );
 
+  const signupEmailPanel = (
+    <div className="text-center">
+      <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl border border-[#E5C158]/35 bg-[#E5C158]/10 text-[#E5C158]">
+        <Mail className="h-7 w-7" />
+      </div>
+      <h2 className="mt-5 font-serif-ar text-3xl font-bold">افتح رسالة تأكيد الحساب</h2>
+      <p className="mt-3 text-sm leading-7 text-[#A89CB9]">
+        أرسلنا رسالة إلى<br />
+        <span dir="ltr" className="font-num text-[#E5C158]">{email}</span>
+      </p>
+      <div className="mt-6 rounded-2xl border border-[#3C2975] bg-[#0D081F]/75 p-4 text-right text-xs leading-7 text-[#C4B7D8]">
+        افتح الرسالة واضغط <strong className="text-white">Confirm email address</strong>، ثم ارجع إلى سيرة وسجّل الدخول بالبريد وكلمة المرور.
+      </div>
+      <button type="button" onClick={() => changeMode('login')} className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-l from-[#D4AF37] to-[#E5C158] px-5 py-3.5 text-sm font-black text-[#110B29] transition hover:to-[#FFE79A]">
+        <BadgeCheck className="h-4 w-4" /> تم التأكيد — انتقل لتسجيل الدخول
+      </button>
+      <div className="mt-5 text-xs text-[#8F82A3]">
+        {resendIn > 0 ? `يمكنك إعادة إرسال الرسالة بعد ${resendIn} ثانية` : (
+          <button type="button" onClick={resendCode} disabled={pending} className="inline-flex items-center gap-1.5 font-bold text-[#E5C158] hover:text-[#FFE79A] disabled:opacity-50">
+            {pending ? <LoaderCircle className="h-3.5 w-3.5 animate-spin" /> : <RotateCcw className="h-3.5 w-3.5" />} إعادة إرسال رسالة التأكيد
+          </button>
+        )}
+      </div>
+      <button type="button" onClick={() => changeMode('signup')} className="mx-auto mt-5 block text-xs text-[#A89CB9] hover:text-white">تغيير البريد الإلكتروني</button>
+    </div>
+  );
+
   return (
     <div className="relative min-h-[calc(100vh-4.5rem)] overflow-hidden bg-[#0D081F] pb-24 text-[#FAF8F5]">
       <div className="pointer-events-none absolute inset-0 opacity-50 bg-[radial-gradient(circle_at_12%_12%,#6D4BC3,transparent_32%),radial-gradient(circle_at_88%_90%,#D4AF37,transparent_27%)]" />
@@ -249,7 +276,7 @@ export const GamesAuthView: React.FC<GamesAuthViewProps> = ({ onAuthenticated, o
             </>
           )}
 
-          {mode === 'signup-otp' && otpPanel('signup')}
+          {mode === 'signup-email' && signupEmailPanel}
           {mode === 'recovery-otp' && otpPanel('recovery')}
 
           {mode === 'forgot' && <div><button type="button" onClick={() => changeMode('login')} className="inline-flex items-center gap-2 text-xs font-bold text-[#E5C158]"><ArrowLeft className="h-4 w-4" /> العودة لتسجيل الدخول</button><div className="mx-auto mt-5 grid h-16 w-16 place-items-center rounded-2xl border border-[#E5C158]/35 bg-[#E5C158]/10 text-[#E5C158]"><KeyRound className="h-7 w-7" /></div><h2 className="mt-5 text-center font-serif-ar text-3xl font-bold">استعادة كلمة المرور</h2><p className="mt-2 text-center text-sm leading-7 text-[#A89CB9]">أدخل البريد المرتبط بحسابك وسنرسل لك رمز تحقق.</p><form onSubmit={submitRecoveryEmail} className="mt-7 space-y-4"><label className="block"><span className="mb-2 block text-xs font-bold text-[#D8CDE8]">البريد الإلكتروني</span><input dir="ltr" value={email} onChange={(event) => setEmail(event.target.value)} type="email" autoComplete="email" required className={`${fieldClass} text-left`} placeholder="saeed@example.com" /></label><button disabled={pending} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#E5C158] px-5 py-3.5 text-sm font-black text-[#110B29] disabled:opacity-60">{pending ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />} إرسال رمز التحقق</button></form></div>}

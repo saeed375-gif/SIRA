@@ -168,7 +168,7 @@ router.post('/resend', rateLimit(3, 60_000), async (req, res) => {
       method: 'POST',
       body: JSON.stringify({ email, type: 'signup' }),
     });
-    return res.json({ message: 'أرسلنا رمزًا جديدًا إلى بريدك الإلكتروني.' });
+    return res.json({ message: 'أرسلنا رسالة تأكيد جديدة إلى بريدك الإلكتروني.' });
   } catch (error) {
     return authError(res, error, 'verify');
   }
