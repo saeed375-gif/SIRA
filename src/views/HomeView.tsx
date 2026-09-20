@@ -139,7 +139,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </div>
 
                 {/* Live Real Google Map Component */}
-                <div className="h-[380px] sm:h-[420px] rounded-2xl overflow-hidden relative">
+                <div className="h-[360px] sm:h-[420px] rounded-2xl overflow-hidden relative">
                   <JerusalemMap
                     places={places}
                     selectedPlace={heroActivePlace}

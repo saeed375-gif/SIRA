@@ -67,7 +67,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   return (
     <div className="h-[calc(100dvh-136px)] md:h-[calc(100dvh-72px)] flex flex-col md:flex-row bg-[#0D081F] text-[#FAF8F5] overflow-hidden relative">
       {/* MAP AREA (Occupies major screen space, on the left for RTL layout) */}
-      <div className="h-[40%] shrink-0 md:flex-1 md:h-full relative order-1 md:order-2">
+      <div className="h-[46%] shrink-0 md:flex-1 md:h-full relative order-1 md:order-2">
         <JerusalemMap
           places={filteredPlaces}
           selectedPlace={visibleSelected}
@@ -77,14 +77,17 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
           zoomLevel={visibleSelected ? 17 : 16}
           centerCoords={visibleSelected ? visibleSelected.location : { lat: 31.7788, lng: 35.2315 }}
           showControls={true}
+          gestureHandling="greedy"
           onExplorePlace={(slug) => onNavigate(`/place/${slug}`)}
         />
 
         {/* Floating Route Toggle on Map */}
-        <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+        <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-20 flex items-center gap-2">
           <button
             onClick={() => setShowRouteOnMap(!showRouteOnMap)}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold shadow-2xl backdrop-blur-md border transition-all ${
+            aria-pressed={showRouteOnMap}
+            aria-label={showRouteOnMap ? 'إخفاء مسار قلب القدس' : 'عرض مسار قلب القدس'}
+            className={`min-w-10 min-h-10 flex items-center justify-center gap-2 px-2.5 sm:px-3.5 py-2 rounded-xl text-xs font-bold shadow-2xl backdrop-blur-md border transition-all ${
               showRouteOnMap
                 ? 'bg-[#E5C158] text-[#110B29] border-[#E5C158] shadow-[#D4AF37]/30'
                 : 'bg-[#160E36]/90 text-[#C4B7D8] border-[#3C2975] hover:text-[#FAF8F5]'
@@ -92,22 +95,22 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
             title="إظهار أو إخفاء مسار رحلة في قلب القدس على الخريطة"
           >
             <Navigation className="w-3.5 h-3.5" />
-            <span>{showRouteOnMap ? 'المسار معروض على الخريطة' : 'عرض مسار قلب القدس'}</span>
+            <span className="hidden sm:inline">{showRouteOnMap ? 'المسار معروض على الخريطة' : 'عرض مسار قلب القدس'}</span>
           </button>
         </div>
       </div>
 
       {/* DISCOVERY PANEL (On the right in RTL, styled as a discovery guide, not a generic dashboard) */}
-      <aside className="w-full md:w-[420px] lg:w-[460px] h-[60%] md:h-full min-h-0 bg-[#110B29] border-t md:border-t-0 md:border-l border-[#24174B] flex flex-col z-30 shadow-2xl order-2 md:order-1">
+      <aside className="w-full md:w-[420px] lg:w-[460px] h-[54%] md:h-full min-h-0 bg-[#110B29] border-t md:border-t-0 md:border-l border-[#24174B] flex flex-col z-30 shadow-2xl order-2 md:order-1">
         
         {/* Panel Header */}
-        <div className="p-4 md:p-5 border-b border-[#24174B] bg-[#140E2E]/90 space-y-3">
+        <div className="p-3 md:p-5 border-b border-[#24174B] bg-[#140E2E]/90 space-y-2.5 md:space-y-3">
           <div className="flex items-center justify-between">
             <div>
               <span className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider block">
                 دليل استكشاف القدس
               </span>
-              <h2 className="text-xl font-bold text-[#FAF8F5] font-serif-ar">
+              <h2 className="text-lg md:text-xl font-bold text-[#FAF8F5] font-serif-ar">
                 ماذا تريد أن تكتشف اليوم؟
               </h2>
             </div>
@@ -192,7 +195,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
         )}
 
         {/* Places List (Discovery Cards) */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 overscroll-contain">
           <div className="flex items-center justify-between text-xs text-[#A89CB9] px-1">
             <span>الأماكن المتاحة ({filteredPlaces.length}):</span>
             <span className="text-[#D4AF37]">انقر على أي مكان لتحريك الخريطة إليه</span>

@@ -83,7 +83,7 @@ export const PlaceDetailView: React.FC<PlaceDetailViewProps> = ({
     <div className="min-h-screen bg-[#0D081F] text-[#FAF8F5] pb-24 md:pb-16 text-right">
       
       {/* CINEMATIC HERO SECTION */}
-      <section className="relative h-[65vh] md:h-[75vh] w-full overflow-hidden flex items-end">
+      <section className="relative min-h-[690px] md:min-h-0 md:h-[75vh] w-full overflow-hidden flex items-end">
         {/* Cinematic Backdrop Image */}
         <img
           src={place.coverImage}
@@ -129,7 +129,7 @@ export const PlaceDetailView: React.FC<PlaceDetailViewProps> = ({
         </div>
 
         {/* Hero Content Information Box */}
-        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 w-full">
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 md:pb-10 pt-28 w-full">
           <div className="space-y-3 max-w-3xl">
             {/* Category and Quarter */}
             <div className="flex flex-wrap items-center gap-2">
@@ -154,16 +154,16 @@ export const PlaceDetailView: React.FC<PlaceDetailViewProps> = ({
             </span>
 
             {/* Excerpt */}
-            <p className="text-sm sm:text-base text-[#DDD5E8] leading-relaxed drop-shadow max-w-2xl pt-1">
+            <p className="text-sm sm:text-base text-[#F2EDF8] leading-7 max-w-2xl rounded-xl border border-white/10 bg-[#110B29]/70 px-3 py-2.5 backdrop-blur-sm">
               {place.shortDescription}
             </p>
 
             {/* Hero Quick Jump CTAs */}
-            <div className="flex flex-wrap items-center gap-3 pt-4">
+            <div className="grid grid-cols-1 min-[420px]:grid-cols-2 sm:flex sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3 pt-4">
               <button
                 id="hero-see-on-map-cta"
                 onClick={() => scrollToSection('geography-section')}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#E5C158] hover:from-[#E5C158] hover:to-[#FFE79A] text-[#110B29] font-bold text-xs sm:text-sm shadow-xl shadow-[#D4AF37]/25 transition-all active:scale-95"
+                className="min-h-12 flex items-center justify-center gap-2 px-5 sm:px-6 py-3 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#E5C158] hover:from-[#E5C158] hover:to-[#FFE79A] text-[#110B29] font-bold text-xs sm:text-sm shadow-xl shadow-[#D4AF37]/25 transition-all active:scale-95"
               >
                 <Map className="w-4 h-4" />
                 <span>شاهد الموقع على الخريطة الحية</span>
@@ -171,7 +171,7 @@ export const PlaceDetailView: React.FC<PlaceDetailViewProps> = ({
 
               <button
                 onClick={() => scrollToSection('audio-section')}
-                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#160E36]/90 hover:bg-[#251854] text-[#FAF8F5] font-bold text-xs sm:text-sm border border-[#3C2975] hover:border-[#D4AF37] backdrop-blur-md shadow-xl transition-all active:scale-95"
+                className="min-h-12 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#160E36]/90 hover:bg-[#251854] text-[#FAF8F5] font-bold text-xs sm:text-sm border border-[#3C2975] hover:border-[#D4AF37] backdrop-blur-md shadow-xl transition-all active:scale-95"
               >
                 <Volume2 className="w-4 h-4 text-[#E5C158]" />
                 <span>استمع إلى القصة ({Math.floor(place.audioStory.durationSeconds / 60)} د)</span>
@@ -179,7 +179,7 @@ export const PlaceDetailView: React.FC<PlaceDetailViewProps> = ({
 
               <button
                 onClick={() => scrollToSection('challenge-section')}
-                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#160E36]/90 hover:bg-[#251854] text-[#E5C158] font-bold text-xs sm:text-sm border border-[#D4AF37]/40 backdrop-blur-md shadow-xl transition-all active:scale-95"
+                className="min-h-12 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#160E36]/90 hover:bg-[#251854] text-[#E5C158] font-bold text-xs sm:text-sm border border-[#D4AF37]/40 backdrop-blur-md shadow-xl transition-all active:scale-95 min-[420px]:col-span-2 sm:col-span-1"
               >
                 <Award className="w-4 h-4" />
                 <span>تحدي المكان</span>

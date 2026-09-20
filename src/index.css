@@ -1,8 +1,14 @@
 @import "tailwindcss";
 
 @layer base {
+  html, body, #root {
+    min-width: 320px;
+    overflow-x: hidden;
+  }
+
   body {
     font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    direction: rtl;
   }
 }
 

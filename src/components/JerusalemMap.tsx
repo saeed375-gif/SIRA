@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
 import { Place, Route, RouteStop } from '../types';
-import { MapPin, Navigation, Eye, Volume2, Compass, Layers, CheckCircle2, ChevronLeft } from 'lucide-react';
+import { MapPin, Navigation, Eye, EyeOff, Volume2, Compass, Layers, ChevronLeft } from 'lucide-react';
 
 interface JerusalemMapProps {
   places: Place[];
@@ -16,6 +16,7 @@ interface JerusalemMapProps {
   centerCoords?: { lat: number; lng: number };
   showControls?: boolean;
   onExplorePlace?: (placeSlug: string) => void;
+  gestureHandling?: 'auto' | 'cooperative' | 'greedy' | 'none';
 }
 
 // Custom midnight purple and gold map style matching the Sira Poster identity
@@ -115,6 +116,7 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
   centerCoords = { lat: 31.7788, lng: 35.2315 }, // Center of Jerusalem Old City
   showControls = true,
   onExplorePlace,
+  gestureHandling = 'cooperative',
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
@@ -126,6 +128,9 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
   const [loadError, setLoadError] = useState<string | null>(null);
   const [mapType, setMapType] = useState<'custom' | 'hybrid'>('custom');
   const [hoveredPlaceId, setHoveredPlaceId] = useState<string | null>(null);
+  const [overlaysVisible, setOverlaysVisible] = useState<boolean>(() =>
+    typeof window === 'undefined' || !window.matchMedia('(max-width: 640px)').matches
+  );
 
   const apiKey = (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyDTCja-GD6n0nsmuvLvEsHADtOUX5062Fc';
 
@@ -215,7 +220,7 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
           streetViewControl: false,
           fullscreenControl: false,
           styles: SIRA_MAP_STYLES,
-          gestureHandling: interactive ? 'auto' : 'none',
+          gestureHandling: interactive ? gestureHandling : 'none',
           backgroundColor: '#140E2E',
           minZoom: 13,
           maxZoom: 20,
@@ -300,6 +305,7 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
       });
 
       marker.addListener('click', () => {
+        setOverlaysVisible(true);
         if (onSelectPlace) {
           onSelectPlace(place);
         }
@@ -406,33 +412,51 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
       )}
 
       {/* Floating Controls Bar */}
-      {showControls && mapLoaded && (
-        <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
+      {mapLoaded && (
+        <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-30 flex items-center gap-1.5 sm:gap-2">
           {/* Map Layer Switcher */}
-          <button
-            id="map-style-toggle"
-            onClick={toggleMapStyle}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#160E36]/90 hover:bg-[#251854] text-xs font-semibold text-[#FAF8F5] border border-[#3C2975] shadow-xl backdrop-blur-md transition-all active:scale-95"
-            title="تبديل نمط الخريطة"
-          >
-            <Layers className="w-4 h-4 text-[#E5C158]" />
-            <span>{mapType === 'custom' ? 'نمط الهوية (سيرة)' : 'قمر صناعي (Satellite)'}</span>
-          </button>
+          {showControls && <button
+              id="map-style-toggle"
+              onClick={toggleMapStyle}
+              className="min-w-10 min-h-10 flex items-center justify-center gap-2 px-2.5 sm:px-3 py-2 rounded-xl bg-[#160E36]/90 hover:bg-[#251854] text-xs font-semibold text-[#FAF8F5] border border-[#3C2975] shadow-xl backdrop-blur-md transition-all active:scale-95"
+              title="تبديل نمط الخريطة"
+              aria-label={mapType === 'custom' ? 'عرض الخريطة بالأقمار الصناعية' : 'عرض خريطة سيرة'}
+            >
+              <Layers className="w-4 h-4 text-[#E5C158]" />
+              <span className="hidden sm:inline">{mapType === 'custom' ? 'نمط الهوية (سيرة)' : 'قمر صناعي'}</span>
+            </button>}
 
           {/* Recenter button */}
-          <button
-            id="map-recenter-btn"
-            onClick={handleRecenter}
-            className="p-2 rounded-xl bg-[#160E36]/90 hover:bg-[#251854] text-[#E5C158] border border-[#3C2975] shadow-xl backdrop-blur-md transition-all active:scale-95"
-            title="إعادة التمركز في قلب البلدة القديمة"
-          >
-            <Compass className="w-4 h-4" />
-          </button>
+          {showControls && <button
+              id="map-recenter-btn"
+              onClick={handleRecenter}
+              className="w-10 h-10 grid place-items-center rounded-xl bg-[#160E36]/90 hover:bg-[#251854] text-[#E5C158] border border-[#3C2975] shadow-xl backdrop-blur-md transition-all active:scale-95"
+              title="إعادة التمركز في قلب البلدة القديمة"
+              aria-label="إعادة تمركز الخريطة في قلب البلدة القديمة"
+            >
+              <Compass className="w-4 h-4" />
+            </button>}
+
+          {(selectedPlace || activeRoute) && <button
+              id="map-overlays-toggle"
+              onClick={() => setOverlaysVisible((visible) => !visible)}
+              aria-pressed={!overlaysVisible}
+              aria-label={overlaysVisible ? 'إخفاء بطاقات المعلومات عن الخريطة' : 'إظهار بطاقات المعلومات على الخريطة'}
+              className={`min-w-10 min-h-10 flex items-center justify-center gap-2 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-bold border shadow-xl backdrop-blur-md transition-all active:scale-95 ${
+                overlaysVisible
+                  ? 'bg-[#160E36]/90 text-[#FAF8F5] border-[#3C2975] hover:bg-[#251854]'
+                  : 'bg-[#E5C158] text-[#110B29] border-[#E5C158]'
+              }`}
+              title={overlaysVisible ? 'إخفاء بطاقات المكان والمسار' : 'إظهار بطاقات المكان والمسار'}
+            >
+              {overlaysVisible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              <span className="hidden sm:inline">{overlaysVisible ? 'إخفاء البطاقات' : 'إظهار البطاقات'}</span>
+            </button>}
         </div>
       )}
 
       {/* Route Info Badge (if active route) */}
-      {activeRoute && (
+      {activeRoute && overlaysVisible && (
         <div className="hidden md:block absolute top-4 right-4 z-10 max-w-xs md:max-w-sm rounded-2xl bg-[#160E36]/95 border border-[#D4AF37]/40 p-3 shadow-2xl backdrop-blur-md text-right">
           <div className="flex items-center justify-between gap-2 mb-1.5">
             <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#E5C158] bg-[#D4AF37]/10 px-2 py-0.5 rounded-full border border-[#D4AF37]/30">
@@ -449,9 +473,9 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
       )}
 
       {/* Selected Place Live Preview Card (Matching Poster Al-Aqsa Card) */}
-      {selectedPlace && (
-        <div className="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-20 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <div className="rounded-2xl bg-[#160E36]/95 border border-[#E5C158]/50 shadow-2xl backdrop-blur-xl p-4 overflow-hidden relative group">
+      {selectedPlace && overlaysVisible && (
+        <div className="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-4 md:left-auto md:right-4 md:w-96 z-20 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="rounded-2xl bg-[#160E36]/95 border border-[#E5C158]/50 shadow-2xl backdrop-blur-xl p-3 sm:p-4 overflow-hidden relative group">
             {/* Subtle Golden Ambient Glow */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-2xl pointer-events-none" />
 
@@ -494,7 +518,7 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
 
             <h4 className="md:hidden text-sm font-bold">{selectedPlace.name}</h4>
             {/* Actions Bar */}
-            <div className="mt-3 pt-3 border-t border-[#2D1F5B] flex items-center justify-between gap-2">
+            <div className="mt-2.5 pt-2.5 sm:mt-3 sm:pt-3 border-t border-[#2D1F5B] flex items-center justify-between gap-2">
               <div className="flex items-center gap-1.5 text-[11px] text-[#E5C158]">
                 <Volume2 className="w-3.5 h-3.5 animate-pulse" />
                 <span className="font-num text-[10px]">

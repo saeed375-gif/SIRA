@@ -269,7 +269,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0D081F] text-[#FAF8F5] flex flex-col selection:bg-[#E5C158] selection:text-[#110B29] font-sans antialiased">
+    <div dir="rtl" lang="ar" className="min-h-screen bg-[#0D081F] text-[#FAF8F5] flex flex-col selection:bg-[#E5C158] selection:text-[#110B29] font-sans antialiased">
       {/* Top Main Navigation */}
       <Navbar
         currentPath={path}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, Map, Navigation, Bookmark, Gamepad2 } from 'lucide-react';
+import { Compass, Map, Navigation, Search, Gamepad2 } from 'lucide-react';
 
 interface MobileBottomNavProps {
   currentPath: string;
@@ -17,21 +17,25 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     { path: '/explore', label: 'استكشف', icon: Map },
     { path: '/routes', label: 'المسارات', icon: Navigation },
     { path: '/games', label: 'ألعاب', icon: Gamepad2 },
-    { path: '/search', label: 'المفضلة', icon: Bookmark, badge: favoritesCount > 0 ? favoritesCount : undefined },
+    { path: '/search', label: 'بحث', icon: Search, badge: favoritesCount > 0 ? favoritesCount : undefined },
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#110B29]/95 backdrop-blur-xl border-t border-[#261A4E] px-4 py-2">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#110B29]/95 backdrop-blur-xl border-t border-[#261A4E] px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
       <div className="flex items-center justify-around">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = currentPath === tab.path;
+          const isActive = currentPath === tab.path ||
+            (tab.path !== '/' && currentPath.startsWith(tab.path)) ||
+            (tab.path === '/explore' && currentPath.startsWith('/place/'));
           return (
             <button
               key={tab.path}
               id={`mobile-tab-${tab.label}`}
               onClick={() => onNavigate(tab.path)}
-              className="flex flex-col items-center justify-center py-1 px-3 relative group focus:outline-none"
+              aria-current={isActive ? 'page' : undefined}
+              aria-label={tab.path === '/search' && favoritesCount > 0 ? `بحث، لديك ${favoritesCount} أماكن مفضلة` : tab.label}
+              className="min-w-0 min-h-12 flex-1 flex flex-col items-center justify-center py-1 px-1 sm:px-3 relative group focus:outline-none"
             >
               <div
                 className={`p-1.5 rounded-xl transition-all ${
@@ -48,7 +52,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 {tab.label}
               </span>
               {tab.badge !== undefined && (
-                <span className="absolute top-1 right-3 w-4 h-4 rounded-full bg-[#E5C158] text-[#110B29] text-[9px] font-bold flex items-center justify-center font-num">
+                <span className="absolute top-0.5 right-[22%] w-4 h-4 rounded-full bg-[#E5C158] text-[#110B29] text-[9px] font-bold flex items-center justify-center font-num">
                   {tab.badge}
                 </span>
               )}

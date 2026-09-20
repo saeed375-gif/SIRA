@@ -45,7 +45,7 @@ export const RouteDetailView: React.FC<RouteDetailViewProps> = ({
     <div className="h-[calc(100dvh-136px)] md:h-[calc(100dvh-72px)] flex flex-col md:flex-row bg-[#0D081F] text-[#FAF8F5] overflow-hidden relative">
       
       {/* MAP CANVAS (Takes majority on left, displaying the gold polyline and stops) */}
-      <div className="h-[40%] shrink-0 md:flex-1 md:h-full relative order-1 md:order-2">
+      <div className="h-[46%] shrink-0 md:flex-1 md:h-full relative order-1 md:order-2">
         <JerusalemMap
           places={places}
           selectedPlace={correspondingPlace || null}
@@ -56,6 +56,7 @@ export const RouteDetailView: React.FC<RouteDetailViewProps> = ({
           zoomLevel={16}
           centerCoords={{ lat: activeStop.lat, lng: activeStop.lng }}
           showControls={true}
+          gestureHandling="greedy"
           onExplorePlace={(slug) => onNavigate(`/place/${slug}`)}
         />
 
@@ -67,10 +68,10 @@ export const RouteDetailView: React.FC<RouteDetailViewProps> = ({
       </div>
 
       {/* STEP-BY-STEP SIDEBAR PANEL (On right for RTL) */}
-      <aside className="w-full md:w-[420px] lg:w-[480px] h-[60%] md:h-full min-h-0 bg-[#110B29] border-t md:border-t-0 md:border-l border-[#24174B] flex flex-col z-30 shadow-2xl order-2 md:order-1 text-right">
+      <aside className="w-full md:w-[420px] lg:w-[480px] h-[54%] md:h-full min-h-0 bg-[#110B29] border-t md:border-t-0 md:border-l border-[#24174B] flex flex-col z-30 shadow-2xl order-2 md:order-1 text-right">
         
         {/* Route Header */}
-        <div className="p-4 md:p-5 border-b border-[#24174B] bg-[#140E2E]/95 space-y-2">
+        <div className="p-3.5 md:p-5 border-b border-[#24174B] bg-[#140E2E]/95 space-y-2">
           <div className="flex items-center justify-between">
             <button
               onClick={() => onNavigate('/routes')}
@@ -130,7 +131,7 @@ export const RouteDetailView: React.FC<RouteDetailViewProps> = ({
         </div>
 
         {/* Active Stop Details Card */}
-        <div key={activeStopIndex} className="flex-1 overflow-y-auto p-4 md:p-5 space-y-4">
+        <div key={activeStopIndex} className="flex-1 overflow-y-auto overscroll-contain p-4 md:p-5 space-y-4">
           {!stopStory && correspondingPlace && (
             <div className="relative rounded-2xl overflow-hidden border border-[#3C2975] h-44 shadow-lg group">
               <img

@@ -128,7 +128,9 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Mobile Hamburger Toggle */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 rounded-xl bg-[#160E36] border border-[#2B1E55] text-[#FAF8F5] focus:outline-none"
+          aria-label={mobileMenuOpen ? 'إغلاق قائمة التنقل' : 'فتح قائمة التنقل'}
+          aria-expanded={mobileMenuOpen}
+          className="md:hidden w-11 h-11 grid place-items-center rounded-xl bg-[#160E36] border border-[#2B1E55] text-[#FAF8F5] focus:outline-none"
         >
           {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
