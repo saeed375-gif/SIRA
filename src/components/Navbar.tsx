@@ -118,18 +118,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           aria-label="سيرة — الصفحة الرئيسية"
           className="flex shrink-0 items-center gap-3 text-right group focus-visible:outline-2 focus-visible:outline-[#E5C158] focus-visible:outline-offset-4 rounded-xl"
         >
-          <SiraLogo className="w-14 h-14 border border-[#D4AF37]/40 group-hover:border-[#E5C158] transition-colors" />
+          <SiraLogo className="h-16 w-16 border border-[#D4AF37]/40 group-hover:border-[#E5C158] transition-colors" />
 
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <span className="text-2xl font-black tracking-tight text-[#FAF8F5] group-hover:text-[#E5C158] transition-colors font-serif-ar">
+              <span className="text-3xl font-black tracking-tight text-[#FAF8F5] group-hover:text-[#E5C158] transition-colors font-serif-ar">
                 سـيرة
               </span>
-              <span className="text-[10px] font-bold text-[#D4AF37] border border-[#D4AF37]/40 px-1.5 py-0.2 rounded font-num uppercase">
+              <span className="text-[11px] font-bold text-[#D4AF37] border border-[#D4AF37]/40 px-1.5 py-0.5 rounded font-num uppercase">
                 Sira
               </span>
             </div>
-            <span className="text-[10px] text-[#A89CB9] font-medium tracking-wide">
+            <span className="text-[11px] text-[#A89CB9] font-medium tracking-wide">
               عِش حكاية القدس
             </span>
           </div>
