@@ -18,6 +18,7 @@ interface GamesViewProps {
   progress: UserDiscoveryProgress;
   onNavigate: (path: string) => void;
   onGameComplete: (gameId: string, points: number) => boolean;
+  onKidsMapEntry: () => boolean;
   onKidsMapStageComplete: (stageId: string) => boolean;
   user: SiraUser;
   onSignOut: () => void;
@@ -402,7 +403,7 @@ const celebrateGame = () => {
   } catch { /* Celebration is optional. */ }
 };
 
-export const GamesView: React.FC<GamesViewProps> = ({ places, progress, onNavigate, onGameComplete, onKidsMapStageComplete, user, onSignOut }) => {
+export const GamesView: React.FC<GamesViewProps> = ({ places, progress, onNavigate, onGameComplete, onKidsMapEntry, onKidsMapStageComplete, user, onSignOut }) => {
   const [activeGame, setActiveGame] = useState<GameId | null>(null);
   const [runRewards, setRunRewards] = useState<Partial<Record<GameId, boolean>>>({});
   useEffect(() => {
@@ -411,6 +412,8 @@ export const GamesView: React.FC<GamesViewProps> = ({ places, progress, onNaviga
   const gameKey = (id: GameId) => `game:${id}-v2`;
   const completed = (id: GameId) => progress.completedChallenges.includes(gameKey(id));
   const startGame = (id: GameId) => {
+    const kidsMapStarted = Boolean(progress.kidsMapGame?.entryFeePaid || progress.kidsMapGame?.completedStageIds.length);
+    if (id === 'kids-map' && !kidsMapStarted && !completed('kids-map') && !onKidsMapEntry()) return;
     setRunRewards((previous) => {
       const next = { ...previous };
       delete next[id];
@@ -465,10 +468,10 @@ export const GamesView: React.FC<GamesViewProps> = ({ places, progress, onNaviga
       <div className="flex items-end justify-between gap-4 mb-5"><div><span className="text-xs text-[#D4AF37]">اختر ساحتك</span><h2 className="font-serif-ar text-3xl font-bold mt-1">ست طرق لاختبار معرفتك</h2></div><span className="hidden sm:block text-xs text-[#756987]">المحتوى يتجدد عند إعادة اللعب</span></div>
       <div className="grid md:grid-cols-2 gap-5">
         {GAME_META.map((game, index) => {
-          const Icon = game.icon; const isDone = completed(game.id); const isKidsMapLocked = game.id === 'kids-map' && progress.totalPoints < 250 && !isDone;
+          const Icon = game.icon; const isDone = completed(game.id); const kidsMapStarted = Boolean(progress.kidsMapGame?.entryFeePaid || progress.kidsMapGame?.completedStageIds.length); const isKidsMapLocked = game.id === 'kids-map' && progress.totalPoints < 250 && !kidsMapStarted && !isDone;
           return <button key={game.id} onClick={() => startGame(game.id)} className={`group relative text-right min-h-72 overflow-hidden rounded-3xl border bg-[#160E36] p-6 sm:p-7 transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/20 ${index === 0 ? 'md:col-span-2' : ''} ${isDone ? 'border-[#22C55E]/45' : isKidsMapLocked ? 'border-[#725B22]/70' : 'border-[#2B1E55] hover:border-[#D4AF37]'}`}>
             <div className={`absolute inset-0 bg-gradient-to-bl ${game.accent} opacity-70`} />
-            <div className="relative h-full flex flex-col"><div className="flex items-start justify-between gap-4"><span className="font-num text-5xl text-white/10">{game.number}</span><div className="w-12 h-12 rounded-2xl border border-white/10 bg-white/5 grid place-items-center">{isKidsMapLocked ? <LockKeyhole className="w-6 h-6 text-[#E5C158]" /> : <Icon className="w-6 h-6 text-[#E5C158]" />}</div></div><span className="text-[10px] text-[#D4AF37] tracking-wider mt-5">{game.eyebrow}</span><h3 className={`font-serif-ar font-bold mt-2 group-hover:text-[#E5C158] transition-colors ${index === 0 ? 'text-3xl' : 'text-2xl'}`}>{game.title}</h3><p className="text-sm text-[#B8ACC9] leading-relaxed mt-3 max-w-2xl flex-1">{game.description}</p><div className="flex flex-wrap items-center gap-2 mt-6 pt-4 border-t border-white/10 text-[11px]"><span className="rounded-full bg-white/5 px-3 py-1.5 inline-flex gap-1"><Clock3 className="w-3.5 h-3.5" /> {game.duration}</span><span className="rounded-full bg-white/5 px-3 py-1.5">{game.difficulty}</span><span className={`mr-auto font-bold ${isDone ? 'text-[#4ADE80]' : 'text-[#E5C158]'}`}>{isDone ? 'أُنجزت ✓' : isKidsMapLocked ? `تُفتح عند 250 نقطة (${progress.totalPoints}/250)` : 'ادخل اللعبة ←'}</span></div></div>
+            <div className="relative h-full flex flex-col"><div className="flex items-start justify-between gap-4"><span className="font-num text-5xl text-white/10">{game.number}</span><div className="w-12 h-12 rounded-2xl border border-white/10 bg-white/5 grid place-items-center">{isKidsMapLocked ? <LockKeyhole className="w-6 h-6 text-[#E5C158]" /> : <Icon className="w-6 h-6 text-[#E5C158]" />}</div></div><span className="text-[10px] text-[#D4AF37] tracking-wider mt-5">{game.eyebrow}</span><h3 className={`font-serif-ar font-bold mt-2 group-hover:text-[#E5C158] transition-colors ${index === 0 ? 'text-3xl' : 'text-2xl'}`}>{game.title}</h3><p className="text-sm text-[#B8ACC9] leading-relaxed mt-3 max-w-2xl flex-1">{game.description}</p><div className="flex flex-wrap items-center gap-2 mt-6 pt-4 border-t border-white/10 text-[11px]"><span className="rounded-full bg-white/5 px-3 py-1.5 inline-flex gap-1"><Clock3 className="w-3.5 h-3.5" /> {game.duration}</span><span className="rounded-full bg-white/5 px-3 py-1.5">{game.difficulty}</span><span className={`mr-auto font-bold ${isDone ? 'text-[#4ADE80]' : 'text-[#E5C158]'}`}>{isDone ? 'أُنجزت ✓' : isKidsMapLocked ? `تحتاج 250 نقطة (${progress.totalPoints}/250)` : 'ادخل اللعبة ←'}</span></div></div>
           </button>;
         })}
       </div>

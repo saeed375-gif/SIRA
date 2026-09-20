@@ -132,6 +132,8 @@ export interface UserDiscoveryProgress {
   kidsMapGame?: {
     completedStageIds: string[];
     stagePoints: number;
+    /** The one-time 250-point entry fee has already been paid. */
+    entryFeePaid?: boolean;
   };
 }
 

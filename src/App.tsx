@@ -233,6 +233,25 @@ export default function App() {
     return true;
   };
 
+  // Entering the children's map consumes 250 platform points once. Stage
+  // keys are deliberately kept separate and never change the platform score.
+  const handleKidsMapEntry = () => {
+    const currentGame = progress.kidsMapGame || { completedStageIds: [], stagePoints: 0 };
+    if (currentGame.entryFeePaid || currentGame.completedStageIds.length > 0) return true;
+    if (progress.totalPoints < 250) return false;
+
+    setProgress((prev) => {
+      const kidsMapGame = prev.kidsMapGame || { completedStageIds: [], stagePoints: 0 };
+      if (kidsMapGame.entryFeePaid || kidsMapGame.completedStageIds.length > 0 || prev.totalPoints < 250) return prev;
+      return {
+        ...prev,
+        totalPoints: prev.totalPoints - 250,
+        kidsMapGame: { ...kidsMapGame, entryFeePaid: true },
+      };
+    });
+    return true;
+  };
+
   const handleKidsMapStageComplete = (stageId: string) => {
     const stageKey = `${KIDS_MAP_STAGE_PREFIX}${stageId}`;
     if ((progress.completedChallenges || []).includes(stageKey)) return false;
@@ -243,6 +262,7 @@ export default function App() {
         ...prev,
         completedChallenges: [...(prev.completedChallenges || []), stageKey],
         kidsMapGame: {
+          ...kidsMapGame,
           completedStageIds: [...kidsMapGame.completedStageIds, stageId],
           stagePoints: kidsMapGame.stagePoints + 50,
         },
@@ -340,6 +360,7 @@ export default function App() {
           progress={progress}
           onNavigate={navigate}
           onGameComplete={handleGameComplete}
+          onKidsMapEntry={handleKidsMapEntry}
           onKidsMapStageComplete={handleKidsMapStageComplete}
           user={gameSession.user}
           onSignOut={handleGameSignOut}
