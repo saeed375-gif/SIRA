@@ -113,13 +113,13 @@ export default function App() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY_PROGRESS);
       if (saved) {
-        const parsed = JSON.parse(saved) as UserDiscoveryProgress;
-        // Old local progress did not distinguish game points. Preserve the
-        // player's completed games as a fair minimum credit after upgrading.
-        const legacyGames = (parsed.completedChallenges || []).filter((id) => id.startsWith('game:')).length;
+        const parsed = JSON.parse(saved) as UserDiscoveryProgress & { gamePoints?: number };
+        // `gamePoints` was briefly stored as a separate balance. The whole
+        // platform now relies on one score only, so omit the obsolete value
+        // when the saved progress is read and re-saved.
+        const { gamePoints: _obsoleteGamePoints, ...savedProgress } = parsed;
         return {
-          ...parsed,
-          gamePoints: typeof parsed.gamePoints === 'number' ? parsed.gamePoints : legacyGames * 50,
+          ...savedProgress,
           kidsMapGame: parsed.kidsMapGame || { completedStageIds: [], stagePoints: 0 },
         };
       }
@@ -129,7 +129,6 @@ export default function App() {
       discoveredPlaceIds: ['bab-al-amoud'], // Bab al-Amoud discovered by default
       completedChallenges: [],
       favoritePlaceIds: [],
-      gamePoints: 0,
       kidsMapGame: { completedStageIds: [], stagePoints: 0 },
     };
   });
@@ -220,8 +219,7 @@ export default function App() {
     return true;
   };
 
-  // Full games contribute to both the overall discovery balance and the
-  // separate balance that unlocks the children's map adventure.
+  // Games use the same platform balance shown everywhere else in Sira.
   const handleGameComplete = (gameId: string, points: number) => {
     if ((progress.completedChallenges || []).includes(gameId)) return false;
     setProgress((prev) => {
@@ -229,7 +227,6 @@ export default function App() {
       return {
         ...prev,
         totalPoints: prev.totalPoints + points,
-        gamePoints: (prev.gamePoints || 0) + points,
         completedChallenges: [...(prev.completedChallenges || []), gameId],
       };
     });
