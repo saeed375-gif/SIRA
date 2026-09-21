@@ -460,12 +460,12 @@ export const GamesView: React.FC<GamesViewProps> = ({ places, progress, onNaviga
       </div>
     </header>
     <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+      <div className="flex items-end justify-between gap-4 mb-5"><div><span className="text-xs text-[#D4AF37]">اختر ساحتك</span><h2 className="font-serif-ar text-3xl font-bold mt-1">ست طرق لاختبار معرفتك</h2></div><span className="hidden sm:block text-xs text-[#756987]">المحتوى يتجدد عند إعادة اللعب</span></div>
       <section className="rounded-3xl border border-[#725B22] bg-gradient-to-l from-[#24183F] to-[#160E36] p-5 sm:p-7 mb-8 flex flex-col sm:flex-row sm:items-center gap-5">
         <div className="w-14 h-14 rounded-2xl bg-[#E5C158] text-[#110B29] grid place-items-center shrink-0"><Zap className="w-7 h-7 fill-current" /></div>
         <div className="flex-1"><span className="text-[10px] text-[#E5C158] tracking-[0.25em]">تحدي اليوم</span><h2 className="font-serif-ar text-2xl font-bold mt-1">سلسلة من خمس إجابات في برق القدس</h2><p className="text-xs text-[#A89CB9] mt-1">اختر بسرعة؛ كل إجابة متتالية تمنحك مضاعف نقاط أعلى.</p></div>
         <button onClick={() => startGame('blitz')} className="rounded-xl bg-[#E5C158] px-6 py-3 text-sm font-bold text-[#110B29] hover:bg-[#FFE79A] shrink-0">ابدأ التحدي</button>
       </section>
-      <div className="flex items-end justify-between gap-4 mb-5"><div><span className="text-xs text-[#D4AF37]">اختر ساحتك</span><h2 className="font-serif-ar text-3xl font-bold mt-1">ست طرق لاختبار معرفتك</h2></div><span className="hidden sm:block text-xs text-[#756987]">المحتوى يتجدد عند إعادة اللعب</span></div>
       <div className="grid md:grid-cols-2 gap-5">
         {GAME_META.map((game, index) => {
           const Icon = game.icon; const isDone = completed(game.id); const kidsMapStarted = Boolean(progress.kidsMapGame?.entryFeePaid || progress.kidsMapGame?.completedStageIds.length); const isKidsMapLocked = game.id === 'kids-map' && progress.totalPoints < 250 && !kidsMapStarted && !isDone;
