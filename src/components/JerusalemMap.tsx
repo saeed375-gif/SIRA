@@ -145,7 +145,7 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
         center: [centerCoords.lat, centerCoords.lng],
         zoom: zoomLevel,
         zoomControl: showControls,
-        attributionControl: true,
+        attributionControl: false,
         dragging: allowInteraction,
         touchZoom: allowInteraction,
         doubleClickZoom: allowInteraction,
