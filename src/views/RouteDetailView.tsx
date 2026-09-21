@@ -56,10 +56,10 @@ export const RouteDetailView: React.FC<RouteDetailViewProps> = ({
   );
 
   return (
-    <div className="h-[calc(100dvh-136px)] md:h-[calc(100dvh-72px)] flex flex-col md:flex-row bg-[#0D081F] text-[#FAF8F5] overflow-hidden relative">
+    <div className="sira-mobile-map-layout h-[calc(100dvh-136px)] md:h-[calc(100dvh-72px)] flex flex-col md:flex-row bg-[#0D081F] text-[#FAF8F5] overflow-hidden relative">
       
       {/* MAP CANVAS (Takes majority on left, displaying the gold polyline and stops) */}
-      <div className="h-[46%] shrink-0 md:flex-1 md:h-full relative order-1 md:order-2">
+      <div className="sira-mobile-map-canvas h-[46%] shrink-0 md:flex-1 md:h-full relative order-1 md:order-2">
         <JerusalemMap
           places={places}
           selectedPlace={correspondingPlace || null}
@@ -82,7 +82,7 @@ export const RouteDetailView: React.FC<RouteDetailViewProps> = ({
       </div>
 
       {/* STEP-BY-STEP SIDEBAR PANEL (On right for RTL) */}
-      <aside className="w-full md:w-[420px] lg:w-[480px] h-[54%] md:h-full min-h-0 bg-[#110B29] border-t md:border-t-0 md:border-l border-[#24174B] flex flex-col z-30 shadow-2xl order-2 md:order-1 text-right">
+      <aside className="sira-mobile-map-panel w-full md:w-[420px] lg:w-[480px] h-[54%] md:h-full min-h-0 bg-[#110B29] border-t md:border-t-0 md:border-l border-[#24174B] flex flex-col z-30 shadow-2xl order-2 md:order-1 text-right">
         
         {/* Route Header */}
         <div className="p-3.5 md:p-5 border-b border-[#24174B] bg-[#140E2E]/95 space-y-2">

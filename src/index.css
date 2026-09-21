@@ -106,6 +106,18 @@ section[id] { scroll-margin-top: 145px; }
   .sira-site-footer button,
   .sira-site-footer a { display: inline-flex; align-items: center; min-height: 40px; }
 }
+
+/* On a phone, keep the map useful without starving its explanation and
+   place list. The safe-area calculation keeps the scrollable panel above the
+   persistent bottom navigation on devices with a gesture bar. */
+@media (max-width: 767px) {
+  .sira-mobile-map-layout {
+    height: calc(100dvh - 9.25rem - env(safe-area-inset-bottom));
+  }
+
+  .sira-mobile-map-canvas { height: 34%; }
+  .sira-mobile-map-panel { height: 66%; }
+}
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
 /* Keep OpenStreetMap key-free while matching Sira's midnight-purple visual identity. */
 .sira-map-night-tiles {

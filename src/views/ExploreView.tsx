@@ -65,9 +65,9 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   const visibleSelected = filteredPlaces.find(p => p.id === selectedPlace?.id) || null;
 
   return (
-    <div className="sira-explore-view h-[calc(100dvh-136px)] md:h-[calc(100dvh-72px)] flex flex-col md:flex-row bg-[#0D081F] text-[#FAF8F5] overflow-hidden relative">
+    <div className="sira-explore-view sira-mobile-map-layout h-[calc(100dvh-136px)] md:h-[calc(100dvh-72px)] flex flex-col md:flex-row bg-[#0D081F] text-[#FAF8F5] overflow-hidden relative">
       {/* MAP AREA (Occupies major screen space, on the left for RTL layout) */}
-      <div className="h-[46%] shrink-0 md:flex-1 md:h-full relative order-1 md:order-2">
+      <div className="sira-mobile-map-canvas h-[46%] shrink-0 md:flex-1 md:h-full relative order-1 md:order-2">
         <JerusalemMap
           places={filteredPlaces}
           selectedPlace={visibleSelected}
@@ -101,10 +101,10 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
       </div>
 
       {/* DISCOVERY PANEL (On the right in RTL, styled as a discovery guide, not a generic dashboard) */}
-      <aside className="sira-explore-panel w-full md:w-[420px] lg:w-[460px] h-[54%] md:h-full min-h-0 bg-[#110B29] border-t md:border-t-0 md:border-l border-[#24174B] flex flex-col z-30 shadow-2xl order-2 md:order-1">
+      <aside className="sira-explore-panel sira-mobile-map-panel w-full md:w-[420px] lg:w-[460px] h-[54%] md:h-full min-h-0 bg-[#110B29] border-t md:border-t-0 md:border-l border-[#24174B] flex flex-col z-30 shadow-2xl order-2 md:order-1">
         
         {/* Panel Header */}
-        <div className="sira-explore-panel-header p-3 md:p-5 border-b border-[#24174B] bg-[#140E2E]/90 space-y-2.5 md:space-y-3">
+        <div className="sira-explore-panel-header shrink-0 p-3 md:p-5 border-b border-[#24174B] bg-[#140E2E]/90 space-y-2.5 md:space-y-3">
           <div className="flex items-center justify-between">
             <div>
               <span className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider block">
@@ -170,7 +170,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
 
         {/* Selected Place Highlight Banner (if selected) */}
         {visibleSelected && (
-          <div className="p-3.5 bg-[#1B1140] border-b border-[#D4AF37]/30 flex items-center justify-between gap-3 animate-in fade-in duration-200">
+          <div className="shrink-0 p-3.5 bg-[#1B1140] border-b border-[#D4AF37]/30 flex items-center justify-between gap-3 animate-in fade-in duration-200">
             <div className="flex items-center gap-2.5 min-w-0">
               <img
                 src={selectedPlace.coverImage}
@@ -195,7 +195,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
         )}
 
         {/* Places List (Discovery Cards) */}
-        <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 overscroll-contain">
+        <div className="min-h-0 flex-1 overflow-y-auto p-3 md:p-4 space-y-3 overscroll-contain">
           <div className="flex items-center justify-between text-xs text-[#A89CB9] px-1">
             <span>الأماكن المتاحة ({filteredPlaces.length}):</span>
             <span className="text-[#D4AF37]">انقر على أي مكان لتحريك الخريطة إليه</span>
