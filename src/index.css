@@ -129,6 +129,29 @@ section[id] { scroll-margin-top: 145px; }
 
   .sira-mobile-map-canvas { height: 34%; }
   .sira-mobile-map-panel { height: 66%; }
+
+  /* The explore screen contains a directory, not a short control panel.
+     Let the whole page scroll on phones so every place is visible in order. */
+  .sira-mobile-explore-layout {
+    height: auto;
+    min-height: calc(100dvh - 4.5rem);
+    overflow: visible;
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  }
+
+  .sira-mobile-explore-layout .sira-mobile-map-canvas {
+    height: clamp(15rem, 38dvh, 21rem);
+  }
+
+  .sira-mobile-explore-layout .sira-mobile-map-panel {
+    height: auto;
+    overflow: visible;
+  }
+
+  .sira-mobile-explore-layout .sira-explore-panel > div:last-child {
+    flex: none;
+    overflow: visible;
+  }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
 /* Keep OpenStreetMap key-free while matching Sira's midnight-purple visual identity. */

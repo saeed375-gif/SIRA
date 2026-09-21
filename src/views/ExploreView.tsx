@@ -65,7 +65,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   const visibleSelected = filteredPlaces.find(p => p.id === selectedPlace?.id) || null;
 
   return (
-    <div className="sira-explore-view sira-mobile-map-layout h-[calc(100dvh-136px)] md:h-[calc(100dvh-72px)] flex flex-col md:flex-row bg-[#0D081F] text-[#FAF8F5] overflow-hidden relative">
+    <div className="sira-explore-view sira-mobile-map-layout sira-mobile-explore-layout h-[calc(100dvh-136px)] md:h-[calc(100dvh-72px)] flex flex-col md:flex-row bg-[#0D081F] text-[#FAF8F5] overflow-hidden relative">
       {/* MAP AREA (Occupies major screen space, on the left for RTL layout) */}
       <div className="sira-mobile-map-canvas h-[46%] shrink-0 md:flex-1 md:h-full relative order-1 md:order-2">
         <JerusalemMap
