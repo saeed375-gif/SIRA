@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Compass, Map, Navigation, Info, Search, Sparkles, Menu, X, Gamepad2, Languages, LoaderCircle, Sun, Moon } from 'lucide-react';
+import { Compass, Map, Navigation, Info, Search, Sparkles, Gamepad2, Languages, LoaderCircle, Sun, Moon } from 'lucide-react';
 import { UserDiscoveryProgress } from '../types';
 import { SiraLogo } from './SiraLogo';
 
@@ -74,7 +74,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   theme,
   onToggleTheme,
 }) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [language, setLanguage] = useState<'ar' | 'en'>(() => hasEnglishTranslationCookie() ? 'en' : 'ar');
   const [translationLoading, setTranslationLoading] = useState(false);
 
@@ -89,7 +88,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const handleNavClick = (path: string) => {
     onNavigate(path);
-    setMobileMenuOpen(false);
   };
 
   useEffect(() => {
@@ -225,70 +223,33 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </div>
 
-        {/* Mobile Hamburger Toggle */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label={mobileMenuOpen ? 'إغلاق قائمة التنقل' : 'فتح قائمة التنقل'}
-          aria-expanded={mobileMenuOpen}
-          className="md:hidden w-11 h-11 grid place-items-center rounded-xl bg-[#160E36] border border-[#2B1E55] text-[#FAF8F5] focus:outline-none"
-        >
-          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
-      </div>
-
-      {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-b border-[#261A4E] bg-[#140E2E]/98 p-4 space-y-2 backdrop-blur-2xl animate-in slide-in-from-top-2 duration-200">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentPath === item.path;
-            return (
-              <button
-                key={item.path}
-                onClick={() => handleNavClick(item.path)}
-                className={`w-full flex items-center justify-between p-3 rounded-xl text-sm font-bold transition-all ${
-                  isActive
-                    ? 'bg-gradient-to-r from-[#D4AF37] to-[#E5C158] text-[#110B29]'
-                    : 'text-[#D8CDE8] hover:bg-[#1E1344]'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className="w-4 h-4 text-[#E5C158]" />
-                  <span>{item.label}</span>
-                </div>
-                {isActive && <span className="text-xs bg-[#110B29]/30 px-2 py-0.5 rounded">الحالي</span>}
-              </button>
-            );
-          })}
-
-          <div className="pt-2 border-t border-[#2B1E55] flex items-center justify-between text-xs text-[#A89CB9] px-1">
-            <span>اكتشفت: {discoveredCount} من {totalPlacesCount} أماكن</span>
-            <span className="text-[#E5C158] font-bold font-num">{progress.totalPoints} نقطة اكتشاف</span>
-          </div>
-
+        {/* Mobile navigation already lives in the persistent bottom bar. Keep
+            the header dedicated to the two global controls instead. */}
+        <div className="notranslate md:hidden flex shrink-0 items-center gap-2" dir="ltr">
           <button
             type="button"
             onClick={toggleLanguage}
             disabled={translationLoading}
-            className="notranslate mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-[#3C2975] bg-[#160E36] p-3 text-sm font-bold text-[#E5C158] transition-colors hover:border-[#D4AF37] hover:bg-[#251854] disabled:cursor-wait disabled:opacity-70"
-            aria-label={language === 'ar' ? 'ترجمة المنصة كاملة إلى الإنجليزية' : 'العودة إلى العربية'}
+            title={language === 'ar' ? 'التحويل إلى الإنجليزية' : 'العودة إلى العربية'}
+            aria-label={language === 'ar' ? 'التحويل إلى الإنجليزية' : 'العودة إلى العربية'}
+            className="grid h-11 w-11 place-items-center rounded-xl border border-[#2B1E55] bg-[#160E36] text-[#E5C158] transition-all hover:border-[#D4AF37] hover:bg-[#251854] focus-visible:outline-2 focus-visible:outline-[#E5C158] focus-visible:outline-offset-4 disabled:cursor-wait disabled:opacity-70"
           >
-            {translationLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Languages className="h-4 w-4" />}
-            {language === 'ar' ? <span>التحويل إلى <span lang="en" dir="ltr">English</span></span> : <span>العودة إلى العربية</span>}
+            {translationLoading ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <Languages className="h-5 w-5" />}
           </button>
-
           <button
             type="button"
             id="sira-theme-toggle-mobile"
             onClick={onToggleTheme}
             aria-pressed={theme === 'light'}
-            className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-[#3C2975] bg-[#160E36] p-3 text-sm font-bold text-[#E5C158] transition-colors hover:border-[#D4AF37] hover:bg-[#251854]"
+            title={theme === 'dark' ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن'}
+            aria-label={theme === 'dark' ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن'}
+            className="grid h-11 w-11 place-items-center rounded-xl border border-[#2B1E55] bg-[#160E36] text-[#E5C158] transition-all hover:border-[#D4AF37] hover:bg-[#251854] focus-visible:outline-2 focus-visible:outline-[#E5C158] focus-visible:outline-offset-4"
           >
-            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            {theme === 'dark' ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن'}
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </button>
         </div>
-      )}
+      </div>
+
       <div id={TRANSLATE_ELEMENT_ID} className="absolute h-px w-px overflow-hidden opacity-0" aria-hidden="true" />
     </header>
   );
