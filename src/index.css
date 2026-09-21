@@ -99,7 +99,19 @@ section[id] { scroll-margin-top: 145px; }
   .leaflet-touch .leaflet-control-zoom a {
     width: 40px;
     height: 40px;
-    line-height: 40px;
+    line-height: 38px;
+    background: #160e36;
+    color: #e5c158;
+    border-color: #3c2975;
+    font-weight: 600;
+  }
+
+  .leaflet-touch .leaflet-control-zoom-in {
+    border-radius: .75rem .75rem 0 0;
+  }
+
+  .leaflet-touch .leaflet-control-zoom-out {
+    border-radius: 0 0 .75rem .75rem;
   }
 
   .life-location { min-height: 40px; }
