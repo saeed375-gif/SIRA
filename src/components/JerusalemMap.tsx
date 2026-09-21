@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { importLibrary, setOptions } from '@googlemaps/js-api-loader';
 import { Place, Route, RouteStop } from '../types';
 import { MapPin, Navigation, Eye, EyeOff, Volume2, Compass, Layers, ChevronLeft } from 'lucide-react';
 
@@ -20,26 +19,25 @@ interface JerusalemMapProps {
   gestureHandling?: 'auto' | 'cooperative' | 'greedy' | 'none';
 }
 
-type SiraMapType = 'satellite' | 'street';
+type SiraMapType = 'roadmap' | 'hybrid';
 
-const TILE_LAYERS: Record<SiraMapType, { url: string; attribution: string; maxNativeZoom?: number }> = {
-  satellite: {
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
-    maxNativeZoom: 19,
-  },
-  street: {
-    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; OpenStreetMap contributors',
-    maxNativeZoom: 19,
-  },
-};
+// Google Maps is deliberately styled to retain Sira's midnight-and-gold identity.
+const SIRA_MAP_STYLES: google.maps.MapTypeStyle[] = [
+  { elementType: 'geometry', stylers: [{ color: '#140E2E' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#140E2E' }, { weight: 3 }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#DDD5C7' }] },
+  { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#E5C158' }] },
+  { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#E5C158' }] },
+  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#1B143A' }] },
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#261A4E' }] },
+  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#36246E' }] },
+  { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#B6A68E' }] },
+  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#3A2675' }] },
+  { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#E5C158' }] },
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#090518' }] },
+];
 
-const createTileLayer = (type: SiraMapType) => L.tileLayer(TILE_LAYERS[type].url, {
-  attribution: TILE_LAYERS[type].attribution,
-  maxZoom: 20,
-  maxNativeZoom: TILE_LAYERS[type].maxNativeZoom,
-});
+let configuredKey: string | undefined;
 
 export const JerusalemMap: React.FC<JerusalemMapProps> = ({
   places,
@@ -57,19 +55,19 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
   gestureHandling = 'cooperative',
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<L.Map | null>(null);
-  const baseLayerRef = useRef<L.TileLayer | null>(null);
-  const markersRef = useRef<Map<string, L.Marker>>(new Map());
-  const routePolylineRef = useRef<L.Polyline | null>(null);
-  const routeGlowPolylineRef = useRef<L.Polyline | null>(null);
+  const mapInstanceRef = useRef<google.maps.Map | null>(null);
+  const markersRef = useRef<Map<string, google.maps.Marker>>(new Map());
+  const routePolylineRef = useRef<google.maps.Polyline | null>(null);
+  const routeGlowPolylineRef = useRef<google.maps.Polyline | null>(null);
 
   const [mapLoaded, setMapLoaded] = useState<boolean>(false);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [mapType, setMapType] = useState<SiraMapType>('satellite');
+  const [mapType, setMapType] = useState<SiraMapType>('roadmap');
   const [hoveredPlaceId, setHoveredPlaceId] = useState<string | null>(null);
   const [overlaysVisible, setOverlaysVisible] = useState(() =>
     typeof window === 'undefined' || !window.matchMedia('(max-width: 640px)').matches
   );
+  const apiKey = (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY?.trim();
 
   // Helper to create SVG data URL for custom Sira Pin Marker
   const createMarkerIcon = useCallback((
@@ -77,7 +75,7 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
     isHovered: boolean,
     badgeNumber?: number | string,
     isRouteStop?: boolean
-  ): L.DivIcon => {
+  ): google.maps.Icon => {
     const size = isSelected ? 48 : isHovered ? 44 : 38;
     const gold = '#E5C158';
     const darkPurple = '#160E36';
@@ -127,83 +125,79 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
       </svg>
     `;
 
-    return L.divIcon({
-      html: svg,
-      className: 'sira-map-marker',
-      iconSize: [size, size + 10],
-      iconAnchor: [size / 2, size + 8],
-    });
+    return {
+      url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+      scaledSize: new google.maps.Size(size, size + 10),
+      anchor: new google.maps.Point(size / 2, size + 8),
+    };
   }, []);
 
   // Initialize Map
   useEffect(() => {
-    if (!mapContainerRef.current || mapInstanceRef.current) return;
+    let isMounted = true;
 
-    try {
-      const allowInteraction = interactive && gestureHandling !== 'none';
-      const map = L.map(mapContainerRef.current, {
-        center: [centerCoords.lat, centerCoords.lng],
-        zoom: zoomLevel,
-        zoomControl: showControls,
-        attributionControl: false,
-        dragging: allowInteraction,
-        touchZoom: allowInteraction,
-        doubleClickZoom: allowInteraction,
-        scrollWheelZoom: allowInteraction && gestureHandling === 'greedy',
-        keyboard: allowInteraction,
-        minZoom: 13,
-        maxZoom: 20,
-      });
+    const initMap = async () => {
+      if (!apiKey) {
+        setLoadError('لم يتم ضبط مفتاح Google Maps.');
+        return;
+      }
 
-      const baseLayer = createTileLayer('satellite');
-      let fallbackActivated = false;
-      baseLayer.on('tileerror', () => {
-        if (fallbackActivated || !mapInstanceRef.current) return;
-        fallbackActivated = true;
-        map.removeLayer(baseLayer);
-        const streetLayer = createTileLayer('street').addTo(map);
-        baseLayerRef.current = streetLayer;
-        setMapType('street');
-      });
-      baseLayer.addTo(map);
+      try {
+        if (configuredKey !== apiKey) {
+          setOptions({ key: apiKey, v: 'weekly', language: 'ar' });
+          configuredKey = apiKey;
+        }
+        await importLibrary('maps');
+        if (!isMounted || !mapContainerRef.current) return;
 
-      mapInstanceRef.current = map;
-      baseLayerRef.current = baseLayer;
-      setMapLoaded(true);
-      window.requestAnimationFrame(() => map.invalidateSize());
-    } catch (err: any) {
-      console.error('Failed to load the interactive map:', err);
-      setLoadError(err?.message || 'تعذر تحميل الخريطة التفاعلية');
-    }
+        const map = new google.maps.Map(mapContainerRef.current, {
+          center: centerCoords,
+          zoom: zoomLevel,
+          disableDefaultUI: !showControls,
+          zoomControl: showControls,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+          styles: SIRA_MAP_STYLES,
+          gestureHandling: interactive ? gestureHandling : 'none',
+          backgroundColor: '#140E2E',
+          minZoom: 13,
+          maxZoom: 20,
+        });
+
+        mapInstanceRef.current = map;
+        setMapLoaded(true);
+      } catch (err: any) {
+        console.error('Failed to load Google Maps:', err);
+        if (isMounted) setLoadError(err?.message || 'تعذر تحميل خريطة Google Maps');
+      }
+    };
+
+    initMap();
 
     return () => {
+      isMounted = false;
       markersRef.current.clear();
-      mapInstanceRef.current?.remove();
       mapInstanceRef.current = null;
-      baseLayerRef.current = null;
     };
-  }, [interactive, showControls, gestureHandling]);
+  }, [apiKey]);
 
   // Update center and zoom when props change
   useEffect(() => {
     if (!mapInstanceRef.current || !mapLoaded) return;
     if (selectedPlace) {
-      mapInstanceRef.current.flyTo(
-        [selectedPlace.location.lat, selectedPlace.location.lng],
-        17,
-        { duration: 0.7 },
-      );
+      mapInstanceRef.current.panTo(selectedPlace.location);
+      mapInstanceRef.current.setZoom(17);
     } else if (centerCoords) {
-      mapInstanceRef.current.panTo([centerCoords.lat, centerCoords.lng]);
+      mapInstanceRef.current.panTo(centerCoords);
     }
   }, [selectedPlace, centerCoords, mapLoaded]);
 
   const toggleMapStyle = () => {
     if (!mapInstanceRef.current) return;
-    const nextType: SiraMapType = mapType === 'satellite' ? 'street' : 'satellite';
-    if (baseLayerRef.current) mapInstanceRef.current.removeLayer(baseLayerRef.current);
-    const nextLayer = createTileLayer(nextType).addTo(mapInstanceRef.current);
-    baseLayerRef.current = nextLayer;
+    const nextType: SiraMapType = mapType === 'roadmap' ? 'hybrid' : 'roadmap';
+    mapInstanceRef.current.setMapTypeId(nextType === 'hybrid' ? google.maps.MapTypeId.HYBRID : google.maps.MapTypeId.ROADMAP);
+    if (nextType === 'roadmap') mapInstanceRef.current.setOptions({ styles: SIRA_MAP_STYLES });
     setMapType(nextType);
   };
 
@@ -213,7 +207,7 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
     const map = mapInstanceRef.current;
 
     // Clear previous markers
-    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current.forEach((marker) => marker.setMap(null));
     markersRef.current.clear();
 
     places.forEach((place) => {
@@ -232,15 +226,16 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
 
       const icon = createMarkerIcon(isSelected, isHovered, routeBadge || (place.layers?.includes('life') ? '•' : undefined), !!routeBadge);
 
-      const marker = L.marker([place.location.lat, place.location.lng], {
+      const marker = new google.maps.Marker({
+        position: place.location,
+        map,
         title: place.name,
-        icon: icon,
-        zIndexOffset: isSelected ? 1000 : routeBadge ? 500 : 100,
-        keyboard: true,
-        riseOnHover: true,
-      }).addTo(map);
+        icon,
+        zIndex: isSelected ? 100 : routeBadge ? 50 : 10,
+        animation: isSelected && !window.matchMedia('(prefers-reduced-motion: reduce)').matches ? google.maps.Animation.DROP : undefined,
+      });
 
-      marker.on('click', () => {
+      marker.addListener('click', () => {
         setOverlaysVisible(true);
         if (onSelectPlace) {
           onSelectPlace(place);
@@ -249,14 +244,14 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
           const index = activeRoute.stops.findIndex(s => s.placeId === place.id);
           if (index >= 0) onSelectStop(activeRoute.stops[index], index);
         }
-        map.panTo([place.location.lat, place.location.lng]);
+        map.panTo(place.location);
       });
 
-      marker.on('mouseover', () => {
+      marker.addListener('mouseover', () => {
         setHoveredPlaceId(place.id);
       });
 
-      marker.on('mouseout', () => {
+      marker.addListener('mouseout', () => {
         setHoveredPlaceId(null);
       });
 
@@ -271,43 +266,49 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
 
     // Clean up old polyline
     if (routePolylineRef.current) {
-      routePolylineRef.current.remove();
+      routePolylineRef.current.setMap(null);
       routePolylineRef.current = null;
     }
     if (routeGlowPolylineRef.current) {
-      routeGlowPolylineRef.current.remove();
+      routeGlowPolylineRef.current.setMap(null);
       routeGlowPolylineRef.current = null;
     }
 
     if (activeRoute && activeRoute.polyline && activeRoute.polyline.length > 0) {
       // Glow underlay polyline
-      const path = activeRoute.polyline.map((point) => [point.lat, point.lng] as L.LatLngTuple);
-      const glowLine = L.polyline(path, {
-        color: '#D4AF37',
-        opacity: 0.35,
-        weight: 10,
-        interactive: false,
-      }).addTo(map);
+      const glowLine = new google.maps.Polyline({
+        path: activeRoute.polyline,
+        geodesic: true,
+        strokeColor: '#D4AF37',
+        strokeOpacity: 0.35,
+        strokeWeight: 10,
+        map,
+      });
       routeGlowPolylineRef.current = glowLine;
 
       // Crisp gold route polyline
-      const line = L.polyline(path, {
-        color: '#E5C158',
-        opacity: 0.95,
-        weight: 4,
-        interactive: false,
-      }).addTo(map);
+      const line = new google.maps.Polyline({
+        path: activeRoute.polyline,
+        geodesic: true,
+        strokeColor: '#E5C158',
+        strokeOpacity: 0.95,
+        strokeWeight: 4,
+        map,
+      });
       routePolylineRef.current = line;
 
       // Fit bounds to show entire route comfortably
-      map.fitBounds(L.latLngBounds(path), { padding: [60, 60] });
+      const bounds = new google.maps.LatLngBounds();
+      activeRoute.polyline.forEach((point) => bounds.extend(point));
+      map.fitBounds(bounds, { top: 60, right: 60, bottom: 60, left: 60 });
     }
   }, [activeRoute, mapLoaded]);
 
   // Recenter to Old City heart
   const handleRecenter = () => {
     if (mapInstanceRef.current) {
-      mapInstanceRef.current.setView([31.7788, 35.2315], 16, { animate: true });
+      mapInstanceRef.current.panTo({ lat: 31.7788, lng: 35.2315 });
+      mapInstanceRef.current.setZoom(16);
     }
   };
 
@@ -326,7 +327,7 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
             </div>
           </div>
           <p className="text-lg font-semibold text-[#FAF8F5]">جاري تحميل خريطة القدس الحية...</p>
-          <span className="text-xs text-[#A89CB9] mt-1">صور أقمار صناعية • منصة سيرة</span>
+          <span className="text-xs text-[#A89CB9] mt-1">Google Maps Platform • منصة سيرة</span>
         </div>
       )}
 
@@ -350,10 +351,10 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
               onClick={toggleMapStyle}
               className="min-w-10 min-h-10 flex items-center justify-center gap-2 px-2.5 sm:px-3 py-2 rounded-xl bg-[#160E36]/90 hover:bg-[#251854] text-xs font-semibold text-[#FAF8F5] border border-[#3C2975] shadow-xl backdrop-blur-md transition-all active:scale-95"
               title="تبديل نمط الخريطة"
-              aria-label={mapType === 'satellite' ? 'عرض خريطة الشوارع' : 'عرض صور الأقمار الصناعية'}
+              aria-label={mapType === 'roadmap' ? 'عرض صور الأقمار الصناعية' : 'عرض خريطة الشوارع'}
             >
               <Layers className="w-4 h-4 text-[#E5C158]" />
-              <span className="hidden sm:inline">{mapType === 'satellite' ? 'قمر صناعي' : 'خريطة الشوارع'}</span>
+              <span className="hidden sm:inline">{mapType === 'roadmap' ? 'قمر صناعي' : 'خريطة الشوارع'}</span>
             </button>
           )}
           {showControls && (

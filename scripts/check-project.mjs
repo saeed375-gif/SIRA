@@ -12,7 +12,7 @@ if (src.includes('SUPABASE_SERVICE_ROLE_KEY')) fail('service-role key name leake
 if (/AIza[0-9A-Za-z_-]{20,}/.test(src)) fail('hard-coded Google API key detected in frontend source'); else ok('no hard-coded Google API key in frontend source');
 if (!src.includes('loadSiraDatabaseData')) fail('Supabase/API data overlay is not wired into App'); else ok('Supabase/API data overlay wired into App');
 
-if (!map.includes("from 'leaflet'") || !map.includes('L.map(') || !map.includes('tile.openstreetmap.org')) fail('Leaflet/OpenStreetMap implementation missing'); else ok('Leaflet/OpenStreetMap implementation configured');
+if (!map.includes("from '@googlemaps/js-api-loader'") || !map.includes('new google.maps.Map(') || !map.includes('VITE_GOOGLE_MAPS_API_KEY')) fail('Google Maps implementation missing'); else ok('Google Maps implementation configured');
 
 const migrationsDir = path.join(root, 'supabase', 'migrations');
 const migrations = fs.readdirSync(migrationsDir).filter((n) => n.endsWith('.sql')).sort();
