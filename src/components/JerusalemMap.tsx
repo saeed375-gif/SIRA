@@ -312,7 +312,7 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
   };
 
   return (
-    <div className={`sira-map-shell relative overflow-hidden rounded-2xl border border-[#2B1E55] bg-[#110B29] ${className}`}>
+    <div className={`sira-map-shell relative isolate z-0 overflow-hidden rounded-2xl border border-[#2B1E55] bg-[#110B29] ${className}`}>
       {/* Map Canvas */}
       <div ref={mapContainerRef} className="w-full h-full min-h-[180px]" />
 

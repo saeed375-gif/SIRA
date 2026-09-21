@@ -190,7 +190,7 @@ export const PlaceDetailView: React.FC<PlaceDetailViewProps> = ({
 
         {/* Copied alert toast */}
         {copiedToast && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#160E36] text-[#E5C158] px-4 py-2 rounded-xl border border-[#D4AF37] text-xs font-bold shadow-2xl animate-in fade-in duration-200">
+          <div className="fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-[#160E36] text-[#E5C158] px-4 py-2 rounded-xl border border-[#D4AF37] text-xs font-bold shadow-2xl animate-in fade-in duration-200">
             تم نسخ رابط الحكاية بنجاح!
           </div>
         )}

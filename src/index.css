@@ -94,6 +94,18 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2px solid #ffe79a; outline-offset: 4px; }
 section[id] { scroll-margin-top: 145px; }
 @media (max-width: 640px) { .life-moments-strip { grid-auto-columns: 87%; } .life-route-row { gap: .65rem; padding: .8rem; } .life-route-row img { width: 56px; height: 64px; } }
+@media (max-width: 640px) {
+  /* Leaflet's stock 30px controls are too small for a touch screen. */
+  .leaflet-touch .leaflet-control-zoom a {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+  }
+
+  .life-location { min-height: 40px; }
+  .sira-site-footer button,
+  .sira-site-footer a { display: inline-flex; align-items: center; min-height: 40px; }
+}
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
 /* Keep OpenStreetMap key-free while matching Sira's midnight-purple visual identity. */
 .sira-map-night-tiles {
