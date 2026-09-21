@@ -11,8 +11,8 @@ if [ "${SKIP_CAPTURE:-0}" != "1" ]; then
   bash "$project_root/scripts/capture-platform-walkthrough-screens.sh" "$capture_directory"
 fi
 
-# Twelve real platform screens, twenty seconds each: a four-minute fallback
-# that can replace the live presentation if connectivity or a live demo fails.
+# Thirteen real platform screens, ten seconds each: a concise fallback that
+# can replace the live presentation if connectivity or a live demo fails.
 # The screens are static explainer shots, so 10 fps keeps the delivery compact.
 arguments=(
   -e
@@ -23,7 +23,7 @@ add_scene() {
   local screen="$1"
   local caption="$2"
   arguments+=(
-    filesrc location="$capture_directory/$screen.png" ! pngdec ! imagefreeze num-buffers=200 ! video/x-raw,framerate=10/1 ! videoconvert ! videoscale ! video/x-raw,width=1280,height=720,pixel-aspect-ratio=1/1
+    filesrc location="$capture_directory/$screen.png" ! pngdec ! imagefreeze num-buffers=100 ! video/x-raw,framerate=10/1 ! videoconvert ! videoscale ! video/x-raw,width=1280,height=720,pixel-aspect-ratio=1/1
     ! textoverlay text="$caption" font-desc="Noto Kufi Arabic Bold 10" color=0xfffaf8f5 outline-color=0xff110b29 halignment=right valignment=bottom xpad=40 ypad=32 shaded-background=true shading-value=185
     ! queue ! walkthrough.
   )
