@@ -278,7 +278,7 @@ router.post('/password', rateLimit(8, 60_000), requireAuth, async (req: Authenti
   }
 });
 
-router.post('/progress/load', rateLimit(30, 60_000), requireAuth, async (req: AuthenticatedRequest, res) => {
+router.post('/progress-load', rateLimit(30, 60_000), requireAuth, async (req: AuthenticatedRequest, res) => {
   try {
     const user = await getSupabaseUser(req.auth!.accessToken);
     return res.json({ progress: cleanProgress(user.user_metadata?.sira_progress) });
@@ -287,7 +287,7 @@ router.post('/progress/load', rateLimit(30, 60_000), requireAuth, async (req: Au
   }
 });
 
-router.post('/progress/sync', rateLimit(20, 60_000), requireAuth, async (req: AuthenticatedRequest, res) => {
+router.post('/progress-sync', rateLimit(20, 60_000), requireAuth, async (req: AuthenticatedRequest, res) => {
   const incoming = cleanProgress(req.body?.progress);
   if (!incoming) return res.status(400).json({ error: 'بيانات التقدم غير صالحة.' });
   try {
@@ -300,7 +300,7 @@ router.post('/progress/sync', rateLimit(20, 60_000), requireAuth, async (req: Au
   }
 });
 
-router.post('/progress/save', rateLimit(30, 60_000), requireAuth, async (req: AuthenticatedRequest, res) => {
+router.post('/progress-save', rateLimit(30, 60_000), requireAuth, async (req: AuthenticatedRequest, res) => {
   const progress = cleanProgress(req.body?.progress);
   if (!progress) return res.status(400).json({ error: 'بيانات التقدم غير صالحة.' });
   try {
