@@ -10,6 +10,15 @@ export interface SiraSession {
   user: SiraUser;
 }
 
+export interface SiraProgressSnapshot {
+  discoveredPlaceIds: string[];
+  completedChallenges: string[];
+  totalPoints: number;
+  favoritePlaceIds: string[];
+  journeys?: Record<string, { revealedStopNumbers: number[]; completedAt?: string }>;
+  kidsMapGame?: { completedStageIds: string[]; stagePoints: number; entryFeePaid?: boolean };
+}
+
 type ApiError = Error & { code?: string; status?: number };
 
 async function request<T>(path: string, body?: unknown, accessToken?: string): Promise<T> {
@@ -49,3 +58,9 @@ export const resendSiraSignupOtp = (email: string) => request<{ message: string 
 export const requestSiraPasswordRecovery = (email: string) => request<{ message: string }>('/recovery', { email });
 export const updateSiraPassword = (password: string, accessToken: string) => request<{ message: string }>('/password', { password }, accessToken);
 export const signOutFromSira = (accessToken?: string) => request<null>('/logout', undefined, accessToken);
+export const loadSiraProgress = async (accessToken: string) => {
+  const response = await request<{ progress: SiraProgressSnapshot | null }>('/progress/load', undefined, accessToken);
+  return response.progress;
+};
+export const syncSiraProgress = (progress: SiraProgressSnapshot, accessToken: string) => request<{ progress: SiraProgressSnapshot }>('/progress/sync', { progress }, accessToken).then((response) => response.progress);
+export const saveSiraProgress = (progress: SiraProgressSnapshot, accessToken: string) => request<{ progress: SiraProgressSnapshot }>('/progress/save', { progress }, accessToken).then((response) => response.progress);

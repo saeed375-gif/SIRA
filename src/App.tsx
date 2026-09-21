@@ -20,7 +20,7 @@ import { AboutView } from './views/AboutView';
 import { GamesView } from './views/GamesView';
 import { GamesAuthLoading, GamesAuthView } from './views/GamesAuthView';
 import { loadSiraDatabaseData } from './services/siraData';
-import { restoreSiraSession, signOutFromSira, type SiraSession } from './services/auth';
+import { loadSiraProgress, restoreSiraSession, saveSiraProgress, signOutFromSira, syncSiraProgress, type SiraSession } from './services/auth';
 import { Heart, Sparkles, MapPin, Compass, Navigation } from 'lucide-react';
 
 const STATIC_ALL_ROUTES = [...JERUSALEM_ROUTES, ...LIFE_ROUTES];
@@ -29,6 +29,55 @@ const STORAGE_KEY_FAVS = 'sira_favorites_v1';
 const STORAGE_KEY_THEME = 'sira_color_theme_v1';
 const KIDS_MAP_STAGE_PREFIX = 'kids-map-stage:';
 type SiraTheme = 'dark' | 'light';
+
+const DEFAULT_PROGRESS: UserDiscoveryProgress = {
+  totalPoints: 50,
+  discoveredPlaceIds: ['bab-al-amoud'],
+  completedChallenges: [],
+  favoritePlaceIds: [],
+  journeys: {},
+  kidsMapGame: { completedStageIds: [], stagePoints: 0 },
+};
+
+const uniqueStrings = (value: unknown, maximum = 250) => Array.from(new Set(
+  Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string' && item.length > 0 && item.length <= 160) : [],
+)).slice(0, maximum);
+const uniqueNumbers = (value: unknown, maximum = 50) => Array.from(new Set(
+  Array.isArray(value) ? value.map(Number).filter(Number.isInteger) : [],
+)).slice(0, maximum);
+
+const normalizeProgress = (value: unknown): UserDiscoveryProgress => {
+  const source = value && typeof value === 'object' ? value as Partial<UserDiscoveryProgress> : {};
+  const sourceJourneys = source.journeys && typeof source.journeys === 'object' ? source.journeys : {};
+  const journeys = Object.fromEntries(Object.entries(sourceJourneys).slice(0, 50).map(([id, journey]) => {
+    const details = journey && typeof journey === 'object' ? journey : {};
+    const completedAt = typeof (details as { completedAt?: unknown }).completedAt === 'string' ? (details as { completedAt: string }).completedAt : undefined;
+    return [id, { revealedStopNumbers: uniqueNumbers((details as { revealedStopNumbers?: unknown }).revealedStopNumbers), ...(completedAt ? { completedAt } : {}) }];
+  }));
+  const kids = source.kidsMapGame && typeof source.kidsMapGame === 'object' ? source.kidsMapGame : DEFAULT_PROGRESS.kidsMapGame!;
+  return {
+    totalPoints: Math.max(0, Math.min(1_000_000, Math.floor(Number(source.totalPoints) || DEFAULT_PROGRESS.totalPoints))),
+    discoveredPlaceIds: uniqueStrings(source.discoveredPlaceIds),
+    completedChallenges: uniqueStrings(source.completedChallenges, 500),
+    favoritePlaceIds: uniqueStrings(source.favoritePlaceIds),
+    journeys,
+    kidsMapGame: {
+      completedStageIds: uniqueStrings(kids.completedStageIds, 20),
+      stagePoints: Math.max(0, Math.min(10_000, Math.floor(Number(kids.stagePoints) || 0))),
+      ...(kids.entryFeePaid ? { entryFeePaid: true } : {}),
+    },
+  };
+};
+
+const readStoredProgress = () => {
+  try { return normalizeProgress(JSON.parse(localStorage.getItem(STORAGE_KEY_PROGRESS) || 'null')); } catch { return DEFAULT_PROGRESS; }
+};
+
+const readStoredFavorites = () => {
+  try { return uniqueStrings(JSON.parse(localStorage.getItem(STORAGE_KEY_FAVS) || 'null')); } catch { return ['al-aqsa-mosque', 'bab-al-amoud']; }
+};
+
+const progressSyncKey = (userId: string) => `sira_progress_sync_v1:${userId}`;
 
 const getInitialTheme = (): SiraTheme => {
   try {
@@ -57,6 +106,7 @@ export default function App() {
   // remains available to guests without creating an account.
   const [gameSession, setGameSession] = useState<SiraSession | null>(null);
   const [gameAuthStatus, setGameAuthStatus] = useState<'idle' | 'loading' | 'guest' | 'authenticated'>('idle');
+  const [progressSyncReady, setProgressSyncReady] = useState(false);
 
   useEffect(() => {
     if (path !== '/games') return;
@@ -77,6 +127,7 @@ export default function App() {
   }, [path]);
 
   const handleGameAuthenticated = (session: SiraSession) => {
+    setProgressSyncReady(false);
     setGameSession(session);
     setGameAuthStatus('authenticated');
   };
@@ -84,6 +135,7 @@ export default function App() {
   const handleGameSignOut = async () => {
     const accessToken = gameSession?.accessToken;
     setGameSession(null);
+    setProgressSyncReady(false);
     setGameAuthStatus('guest');
     try { await signOutFromSira(accessToken); } catch { /* Local session is already cleared. */ }
   };
@@ -109,40 +161,10 @@ export default function App() {
   }, []);
 
   // User Discovery Progress state (Points, Discovered Places, Completed Challenges)
-  const [progress, setProgress] = useState<UserDiscoveryProgress>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY_PROGRESS);
-      if (saved) {
-        const parsed = JSON.parse(saved) as UserDiscoveryProgress & { gamePoints?: number };
-        // `gamePoints` was briefly stored as a separate balance. The whole
-        // platform now relies on one score only, so omit the obsolete value
-        // when the saved progress is read and re-saved.
-        const { gamePoints: _obsoleteGamePoints, ...savedProgress } = parsed;
-        return {
-          ...savedProgress,
-          journeys: parsed.journeys || {},
-          kidsMapGame: parsed.kidsMapGame || { completedStageIds: [], stagePoints: 0 },
-        };
-      }
-    } catch (e) {}
-    return {
-      totalPoints: 50,
-      discoveredPlaceIds: ['bab-al-amoud'], // Bab al-Amoud discovered by default
-      completedChallenges: [],
-      favoritePlaceIds: [],
-      journeys: {},
-      kidsMapGame: { completedStageIds: [], stagePoints: 0 },
-    };
-  });
+  const [progress, setProgress] = useState<UserDiscoveryProgress>(readStoredProgress);
 
   // Favorites state
-  const [favorites, setFavorites] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY_FAVS);
-      if (saved) return JSON.parse(saved);
-    } catch (e) {}
-    return ['al-aqsa-mosque', 'bab-al-amoud'];
-  });
+  const [favorites, setFavorites] = useState<string[]>(readStoredFavorites);
 
   useEffect(() => {
     try {
@@ -159,6 +181,47 @@ export default function App() {
       localStorage.setItem(STORAGE_KEY_PROGRESS, JSON.stringify(progress));
     } catch (e) {}
   }, [progress]);
+
+  // A signed-in account is the source of truth across devices. On the first
+  // version that supports cloud sync, safely merge each device's old local
+  // balance once, then use the stored Supabase account data thereafter.
+  useEffect(() => {
+    let active = true;
+    if (!gameSession) {
+      setProgressSyncReady(false);
+      return () => { active = false; };
+    }
+
+    setProgressSyncReady(false);
+    const localProgress = normalizeProgress({ ...readStoredProgress(), favoritePlaceIds: readStoredFavorites() });
+    const sync = async () => {
+      const alreadyMigrated = localStorage.getItem(progressSyncKey(gameSession.user.id)) === '1';
+      const cloudProgress = alreadyMigrated
+        ? await loadSiraProgress(gameSession.accessToken)
+        : await syncSiraProgress(localProgress, gameSession.accessToken);
+      if (!active) return;
+      if (cloudProgress) {
+        const next = normalizeProgress(cloudProgress);
+        setProgress(next);
+        setFavorites(next.favoritePlaceIds);
+      }
+      if (!alreadyMigrated) localStorage.setItem(progressSyncKey(gameSession.user.id), '1');
+    };
+
+    void sync().catch((error) => console.warn('[Sira] Unable to restore cloud progress.', error)).finally(() => {
+      if (active) setProgressSyncReady(true);
+    });
+    return () => { active = false; };
+  }, [gameSession]);
+
+  useEffect(() => {
+    if (!gameSession || !progressSyncReady) return;
+    const timer = window.setTimeout(() => {
+      void saveSiraProgress({ ...progress, favoritePlaceIds: favorites }, gameSession.accessToken)
+        .catch((error) => console.warn('[Sira] Unable to save cloud progress.', error));
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [favorites, gameSession, progress, progressSyncReady]);
 
   // Keep favorites synced to localStorage
   useEffect(() => {
@@ -194,11 +257,9 @@ export default function App() {
   // Toggle Favorite
   const toggleFavorite = (placeId: string) => {
     setFavorites((prev) => {
-      if (prev.includes(placeId)) {
-        return prev.filter((id) => id !== placeId);
-      } else {
-        return [...prev, placeId];
-      }
+      const next = prev.includes(placeId) ? prev.filter((id) => id !== placeId) : [...prev, placeId];
+      setProgress((current) => ({ ...current, favoritePlaceIds: next }));
+      return next;
     });
   };
 
@@ -385,6 +446,7 @@ export default function App() {
       if (!gameSession) {
         return <GamesAuthView onAuthenticated={handleGameAuthenticated} onBack={() => navigate('/')} />;
       }
+      if (!progressSyncReady) return <GamesAuthLoading />;
       return (
         <GamesView
           places={places}

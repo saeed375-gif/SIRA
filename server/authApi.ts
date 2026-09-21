@@ -15,7 +15,7 @@ router.use((_req, res, next) => {
 type SupabaseUser = {
   id: string;
   email?: string;
-  user_metadata?: { display_name?: string };
+  user_metadata?: Record<string, unknown> & { display_name?: string };
 };
 
 type SupabaseSession = {
@@ -57,6 +57,84 @@ function cleanEmail(value: unknown) {
 
 function validEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+type ProgressSnapshot = {
+  discoveredPlaceIds: string[];
+  completedChallenges: string[];
+  totalPoints: number;
+  favoritePlaceIds: string[];
+  journeys: Record<string, { revealedStopNumbers: number[]; completedAt?: string }>;
+  kidsMapGame: { completedStageIds: string[]; stagePoints: number; entryFeePaid?: boolean };
+};
+
+const uniqueStrings = (value: unknown, maximum = 250) => Array.from(new Set(
+  Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string' && item.length > 0 && item.length <= 160) : [],
+)).slice(0, maximum);
+const uniqueNumbers = (value: unknown, maximum = 50) => Array.from(new Set(
+  Array.isArray(value) ? value.map(Number).filter(Number.isInteger) : [],
+)).slice(0, maximum);
+
+function cleanProgress(value: unknown): ProgressSnapshot | null {
+  if (!value || typeof value !== 'object') return null;
+  const source = value as Record<string, unknown>;
+  const rawJourneys = source.journeys && typeof source.journeys === 'object' ? source.journeys as Record<string, unknown> : {};
+  const journeys = Object.fromEntries(Object.entries(rawJourneys).slice(0, 50).map(([id, journey]) => {
+    const details = journey && typeof journey === 'object' ? journey as Record<string, unknown> : {};
+    const completedAt = typeof details.completedAt === 'string' ? details.completedAt : undefined;
+    return [id, { revealedStopNumbers: uniqueNumbers(details.revealedStopNumbers), ...(completedAt ? { completedAt } : {}) }];
+  }));
+  const kids = source.kidsMapGame && typeof source.kidsMapGame === 'object' ? source.kidsMapGame as Record<string, unknown> : {};
+  return {
+    totalPoints: Math.max(0, Math.min(1_000_000, Math.floor(Number(source.totalPoints) || 50))),
+    discoveredPlaceIds: uniqueStrings(source.discoveredPlaceIds),
+    completedChallenges: uniqueStrings(source.completedChallenges, 500),
+    favoritePlaceIds: uniqueStrings(source.favoritePlaceIds),
+    journeys,
+    kidsMapGame: {
+      completedStageIds: uniqueStrings(kids.completedStageIds, 20),
+      stagePoints: Math.max(0, Math.min(10_000, Math.floor(Number(kids.stagePoints) || 0))),
+      ...(kids.entryFeePaid === true ? { entryFeePaid: true } : {}),
+    },
+  };
+}
+
+function mergeProgress(existing: ProgressSnapshot | null, incoming: ProgressSnapshot): ProgressSnapshot {
+  if (!existing) return incoming;
+  const journeys = { ...existing.journeys };
+  for (const [id, journey] of Object.entries(incoming.journeys)) {
+    const previous = journeys[id];
+    journeys[id] = {
+      revealedStopNumbers: uniqueNumbers([...(previous?.revealedStopNumbers || []), ...journey.revealedStopNumbers]),
+      ...(previous?.completedAt || journey.completedAt ? { completedAt: previous?.completedAt || journey.completedAt } : {}),
+    };
+  }
+  return {
+    totalPoints: Math.max(existing.totalPoints, incoming.totalPoints),
+    discoveredPlaceIds: uniqueStrings([...existing.discoveredPlaceIds, ...incoming.discoveredPlaceIds]),
+    completedChallenges: uniqueStrings([...existing.completedChallenges, ...incoming.completedChallenges], 500),
+    favoritePlaceIds: uniqueStrings([...existing.favoritePlaceIds, ...incoming.favoritePlaceIds]),
+    journeys,
+    kidsMapGame: {
+      completedStageIds: uniqueStrings([...existing.kidsMapGame.completedStageIds, ...incoming.kidsMapGame.completedStageIds], 20),
+      stagePoints: Math.max(existing.kidsMapGame.stagePoints, incoming.kidsMapGame.stagePoints),
+      ...(existing.kidsMapGame.entryFeePaid || incoming.kidsMapGame.entryFeePaid ? { entryFeePaid: true } : {}),
+    },
+  };
+}
+
+async function getSupabaseUser(accessToken: string) {
+  return supabaseFetch<SupabaseUser>('/auth/v1/user', { accessToken });
+}
+
+async function persistProgress(accessToken: string, user: SupabaseUser, progress: ProgressSnapshot) {
+  // Progress is account data only. It is never read from JWT claims or used
+  // for authorization, so users cannot grant themselves extra permissions.
+  await supabaseFetch('/auth/v1/user', {
+    method: 'PUT',
+    accessToken,
+    body: JSON.stringify({ data: { ...(user.user_metadata || {}), sira_progress: progress } }),
+  });
 }
 
 function authError(res: Response, error: unknown, context: 'login' | 'signup' | 'verify' | 'recovery' | 'password') {
@@ -197,6 +275,40 @@ router.post('/password', rateLimit(8, 60_000), requireAuth, async (req: Authenti
     return res.json({ message: 'تم تغيير كلمة المرور بنجاح.' });
   } catch (error) {
     return authError(res, error, 'password');
+  }
+});
+
+router.post('/progress/load', rateLimit(30, 60_000), requireAuth, async (req: AuthenticatedRequest, res) => {
+  try {
+    const user = await getSupabaseUser(req.auth!.accessToken);
+    return res.json({ progress: cleanProgress(user.user_metadata?.sira_progress) });
+  } catch {
+    return res.status(503).json({ error: 'تعذر استعادة تقدم الحساب حاليًا.' });
+  }
+});
+
+router.post('/progress/sync', rateLimit(20, 60_000), requireAuth, async (req: AuthenticatedRequest, res) => {
+  const incoming = cleanProgress(req.body?.progress);
+  if (!incoming) return res.status(400).json({ error: 'بيانات التقدم غير صالحة.' });
+  try {
+    const user = await getSupabaseUser(req.auth!.accessToken);
+    const progress = mergeProgress(cleanProgress(user.user_metadata?.sira_progress), incoming);
+    await persistProgress(req.auth!.accessToken, user, progress);
+    return res.json({ progress });
+  } catch {
+    return res.status(503).json({ error: 'تعذر مزامنة تقدم الحساب حاليًا.' });
+  }
+});
+
+router.post('/progress/save', rateLimit(30, 60_000), requireAuth, async (req: AuthenticatedRequest, res) => {
+  const progress = cleanProgress(req.body?.progress);
+  if (!progress) return res.status(400).json({ error: 'بيانات التقدم غير صالحة.' });
+  try {
+    const user = await getSupabaseUser(req.auth!.accessToken);
+    await persistProgress(req.auth!.accessToken, user, progress);
+    return res.json({ progress });
+  } catch {
+    return res.status(503).json({ error: 'تعذر حفظ تقدم الحساب حاليًا.' });
   }
 });
 
