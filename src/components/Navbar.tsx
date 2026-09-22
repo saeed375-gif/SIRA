@@ -87,13 +87,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   useEffect(() => {
-    // On the first visit, persist the detected device language and reload before
-    // Google mutates the React tree. Manual selections follow the same path.
+    // Set the device-language cookie before loading Google Translate. This
+    // applies automatic translation without unexpectedly refreshing the page.
     const translatedLanguage = getTranslationCookie();
-    if (translatedLanguage !== language && (language !== 'ar' || translatedLanguage)) {
+    if (translatedLanguage !== language) {
       setTranslationCookie(language, false);
-      window.location.reload();
-      return;
     }
     if (language === 'ar') return;
     void loadGoogleTranslate().catch(() => setTranslationLoading(false));
