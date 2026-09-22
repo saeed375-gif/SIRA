@@ -119,7 +119,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           aria-label="سيرة — الصفحة الرئيسية"
           className="flex shrink-0 items-center text-right group focus-visible:outline-2 focus-visible:outline-[#E5C158] focus-visible:outline-offset-4 rounded-xl"
         >
-          <SiraLogo className="h-16 w-16 opacity-95 transition-opacity group-hover:opacity-100" />
+          <SiraLogo className="h-[4.25rem] w-[4.25rem] opacity-95 transition-opacity group-hover:opacity-100" />
         </button>
 
         {/* Desktop Navigation Links */}
