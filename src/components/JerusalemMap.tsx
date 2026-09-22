@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { importLibrary, setOptions } from '@googlemaps/js-api-loader';
 import { Place, Route, RouteStop } from '../types';
 import { MapPin, Navigation, Eye, EyeOff, Volume2, Compass, Layers, ChevronLeft } from 'lucide-react';
+import { getInitialPlatformLanguage } from '../lib/translation';
 
 interface JerusalemMapProps {
   places: Place[];
@@ -144,7 +145,7 @@ export const JerusalemMap: React.FC<JerusalemMapProps> = ({
 
       try {
         if (configuredKey !== apiKey) {
-          setOptions({ key: apiKey, v: 'weekly', language: 'ar' });
+          setOptions({ key: apiKey, v: 'weekly', language: getInitialPlatformLanguage() });
           configuredKey = apiKey;
         }
         await importLibrary('maps');

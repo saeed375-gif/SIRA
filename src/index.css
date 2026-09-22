@@ -8,7 +8,7 @@
 
   body {
     font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    direction: rtl;
+    direction: inherit;
     /* Google Translate reserves space for its browser-style banner by adding
        an inline `top` offset to the body. Keep translation in-page only. */
     top: 0 !important;

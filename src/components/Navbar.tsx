@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Compass, Map, Navigation, Info, Search, Sparkles, Gamepad2, Languages, LoaderCircle, Sun, Moon } from 'lucide-react';
 import { UserDiscoveryProgress } from '../types';
 import { SiraLogo } from './SiraLogo';
+import { PLATFORM_LANGUAGES, getTranslationCookie, setTranslationCookie, type PlatformLanguage } from '../lib/translation';
 
 interface NavbarProps {
   currentPath: string;
@@ -10,6 +11,8 @@ interface NavbarProps {
   totalPlacesCount: number;
   theme: 'dark' | 'light';
   onToggleTheme: () => void;
+  language: PlatformLanguage;
+  onLanguageChange: (language: PlatformLanguage) => void;
 }
 
 declare global {
@@ -28,14 +31,6 @@ const TRANSLATE_SCRIPT_ID = 'sira-google-translate-script';
 let googleTranslateReady: Promise<void> | null = null;
 let googleTranslateInitialised = false;
 
-const hasEnglishTranslationCookie = () => document.cookie.split('; ').some((cookie) => cookie === 'googtrans=/ar/en');
-
-const setTranslationCookie = (language: 'ar' | 'en') => {
-  const value = language === 'en' ? 'googtrans=/ar/en' : 'googtrans=';
-  const expiry = language === 'en' ? 'max-age=31536000' : 'max-age=0';
-  document.cookie = `${value}; path=/; ${expiry}; SameSite=Lax`;
-};
-
 const loadGoogleTranslate = () => {
   if (googleTranslateReady) return googleTranslateReady;
 
@@ -43,7 +38,7 @@ const loadGoogleTranslate = () => {
     const initialise = () => {
       if (!googleTranslateInitialised && window.google?.translate?.TranslateElement) {
         new window.google.translate.TranslateElement(
-          { pageLanguage: 'ar', includedLanguages: 'ar,en', autoDisplay: false },
+          { pageLanguage: 'ar', includedLanguages: PLATFORM_LANGUAGES.map((language) => language.code).join(','), autoDisplay: false },
           TRANSLATE_ELEMENT_ID,
         );
         googleTranslateInitialised = true;
@@ -73,8 +68,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   totalPlacesCount,
   theme,
   onToggleTheme,
+  language,
+  onLanguageChange,
 }) => {
-  const [language, setLanguage] = useState<'ar' | 'en'>(() => hasEnglishTranslationCookie() ? 'en' : 'ar');
   const [translationLoading, setTranslationLoading] = useState(false);
 
   const navItems = [
@@ -91,14 +87,23 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   useEffect(() => {
-    if (language !== 'en') return;
+    // On the first visit, persist the detected device language and reload before
+    // Google mutates the React tree. Manual selections follow the same path.
+    const translatedLanguage = getTranslationCookie();
+    if (translatedLanguage !== language && (language !== 'ar' || translatedLanguage)) {
+      setTranslationCookie(language, false);
+      window.location.reload();
+      return;
+    }
+    if (language === 'ar') return;
     void loadGoogleTranslate().catch(() => setTranslationLoading(false));
   }, [language]);
 
-  const toggleLanguage = () => {
-    const nextLanguage = language === 'ar' ? 'en' : 'ar';
+  const changeLanguage = (nextLanguage: PlatformLanguage) => {
+    if (nextLanguage === language && getTranslationCookie()) return;
     setTranslationLoading(true);
     setTranslationCookie(nextLanguage);
+    onLanguageChange(nextLanguage);
     // The widget reads this cookie while the page starts. Reloading before it
     // mutates content keeps React's DOM tree stable and avoids the proxy warning.
     window.location.reload();
@@ -156,17 +161,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
 
         {/* Google Translate runs inside the page, avoiding the form warning shown by its proxy URL. */}
-        <button
-          type="button"
-          onClick={toggleLanguage}
-          disabled={translationLoading}
-          title={language === 'ar' ? 'ترجمة المنصة كاملة إلى الإنجليزية' : 'العودة إلى العربية'}
-          aria-label={language === 'ar' ? 'ترجمة المنصة كاملة إلى الإنجليزية' : 'العودة إلى العربية'}
-          className="notranslate hidden md:inline-flex shrink-0 items-center gap-2 rounded-xl border border-[#3C2975] bg-[#160E36] px-3 py-2 text-xs font-bold text-[#E5C158] transition-all hover:border-[#D4AF37] hover:bg-[#251854] focus-visible:outline-2 focus-visible:outline-[#E5C158] focus-visible:outline-offset-4 disabled:cursor-wait disabled:opacity-70"
-        >
+        <label className="notranslate hidden md:inline-flex shrink-0 items-center gap-2 rounded-xl border border-[#3C2975] bg-[#160E36] px-3 py-2 text-xs font-bold text-[#E5C158] transition-all hover:border-[#D4AF37] hover:bg-[#251854] focus-within:outline-2 focus-within:outline-[#E5C158] focus-within:outline-offset-4">
           {translationLoading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Languages className="h-4 w-4" />}
-          {language === 'ar' ? <span lang="en" dir="ltr">English</span> : <span>العربية</span>}
-        </button>
+          <span className="sr-only">لغة المنصة</span>
+          <select value={language} onChange={(event) => changeLanguage(event.target.value as PlatformLanguage)} disabled={translationLoading} aria-label="لغة المنصة" className="max-w-28 cursor-pointer appearance-none bg-transparent text-xs font-bold text-[#E5C158] outline-none disabled:cursor-wait">
+            {PLATFORM_LANGUAGES.map((item) => <option key={item.code} value={item.code} className="bg-[#160E36] text-[#FAF8F5]">{item.label}</option>)}
+          </select>
+        </label>
 
         <button
           type="button"
@@ -226,16 +227,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Mobile navigation already lives in the persistent bottom bar. Keep
             the header dedicated to the two global controls instead. */}
         <div className="notranslate md:hidden flex shrink-0 items-center gap-2" dir="ltr">
-          <button
-            type="button"
-            onClick={toggleLanguage}
-            disabled={translationLoading}
-            title={language === 'ar' ? 'التحويل إلى الإنجليزية' : 'العودة إلى العربية'}
-            aria-label={language === 'ar' ? 'التحويل إلى الإنجليزية' : 'العودة إلى العربية'}
-            className="grid h-11 w-11 place-items-center rounded-xl border border-[#2B1E55] bg-[#160E36] text-[#E5C158] transition-all hover:border-[#D4AF37] hover:bg-[#251854] focus-visible:outline-2 focus-visible:outline-[#E5C158] focus-visible:outline-offset-4 disabled:cursor-wait disabled:opacity-70"
-          >
+          <label className="relative grid h-11 w-11 place-items-center rounded-xl border border-[#2B1E55] bg-[#160E36] text-[#E5C158] transition-all hover:border-[#D4AF37] hover:bg-[#251854] focus-within:outline-2 focus-within:outline-[#E5C158] focus-within:outline-offset-4">
             {translationLoading ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <Languages className="h-5 w-5" />}
-          </button>
+            <span className="sr-only">لغة المنصة</span>
+            <select value={language} onChange={(event) => changeLanguage(event.target.value as PlatformLanguage)} disabled={translationLoading} aria-label="لغة المنصة" className="absolute h-11 w-11 cursor-pointer appearance-none bg-transparent text-transparent outline-none disabled:cursor-wait">
+              {PLATFORM_LANGUAGES.map((item) => <option key={item.code} value={item.code}>{item.label}</option>)}
+            </select>
+          </label>
           <button
             type="button"
             id="sira-theme-toggle-mobile"

@@ -22,6 +22,7 @@ import { GamesAuthLoading, GamesAuthView } from './views/GamesAuthView';
 import { loadSiraDatabaseData } from './services/siraData';
 import { loadSiraProgress, restoreSiraSession, saveSiraProgress, signOutFromSira, syncSiraProgress, type SiraSession } from './services/auth';
 import { cleanGameCompletions, hasActiveGameCompletion } from './lib/gameRewards';
+import { getInitialPlatformLanguage, getLanguageDirection, type PlatformLanguage } from './lib/translation';
 import { Heart, Sparkles, MapPin, Compass, Navigation } from 'lucide-react';
 
 const STATIC_ALL_ROUTES = [...JERUSALEM_ROUTES, ...LIFE_ROUTES];
@@ -92,6 +93,7 @@ const getInitialTheme = (): SiraTheme => {
 
 export default function App() {
   const [theme, setTheme] = useState<SiraTheme>(getInitialTheme);
+  const [language, setLanguage] = useState<PlatformLanguage>(getInitialPlatformLanguage);
   // Current Route Path
   const [currentPath, setCurrentPath] = useState<string>(() => {
     return window.location.pathname + window.location.search + window.location.hash;
@@ -175,6 +177,11 @@ export default function App() {
     } catch { /* The visual preference remains active for this visit. */ }
     document.documentElement.style.colorScheme = theme;
   }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+    document.documentElement.dir = getLanguageDirection(language);
+  }, [language]);
 
   const toggleTheme = () => setTheme((currentTheme) => currentTheme === 'dark' ? 'light' : 'dark');
 
@@ -503,7 +510,7 @@ export default function App() {
   };
 
   return (
-    <div dir="rtl" lang="ar" className={`sira-theme sira-theme-${theme} min-h-screen bg-[#0D081F] text-[#FAF8F5] flex flex-col selection:bg-[#E5C158] selection:text-[#110B29] font-sans antialiased`}>
+    <div dir={getLanguageDirection(language)} lang={language} className={`sira-theme sira-theme-${theme} min-h-screen bg-[#0D081F] text-[#FAF8F5] flex flex-col selection:bg-[#E5C158] selection:text-[#110B29] font-sans antialiased`}>
       {/* Top Main Navigation */}
       <Navbar
         currentPath={path}
@@ -512,6 +519,8 @@ export default function App() {
         totalPlacesCount={places.length}
         theme={theme}
         onToggleTheme={toggleTheme}
+        language={language}
+        onLanguageChange={setLanguage}
       />
 
       {/* Main View Area */}
