@@ -113,27 +113,13 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sira-site-header sticky top-0 z-40 w-full bg-[#110B29]/95 backdrop-blur-xl border-b border-[#261A4E] transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
-        {/* Brand / Logo (Sira) */}
+        {/* Brand logo */}
         <button
           onClick={() => handleNavClick('/')}
           aria-label="سيرة — الصفحة الرئيسية"
-          className="flex shrink-0 items-center gap-3 text-right group focus-visible:outline-2 focus-visible:outline-[#E5C158] focus-visible:outline-offset-4 rounded-xl"
+          className="flex shrink-0 items-center text-right group focus-visible:outline-2 focus-visible:outline-[#E5C158] focus-visible:outline-offset-4 rounded-xl"
         >
-          <SiraLogo className="h-16 w-16 border border-[#D4AF37]/40 group-hover:border-[#E5C158] transition-colors" />
-
-          <div className="flex flex-col">
-            <div className="flex items-center gap-1.5">
-              <span className="text-3xl font-black tracking-tight text-[#FAF8F5] group-hover:text-[#E5C158] transition-colors font-serif-ar">
-                سـيرة
-              </span>
-              <span className="text-[11px] font-bold text-[#D4AF37] border border-[#D4AF37]/40 px-1.5 py-0.5 rounded font-num uppercase">
-                Sira
-              </span>
-            </div>
-            <span className="text-[11px] text-[#A89CB9] font-medium tracking-wide">
-              عِش حكاية القدس
-            </span>
-          </div>
+          <SiraLogo className="h-16 w-16 opacity-95 transition-opacity group-hover:opacity-100" />
         </button>
 
         {/* Desktop Navigation Links */}
