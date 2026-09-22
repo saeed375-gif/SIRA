@@ -37,6 +37,99 @@ body {
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
+/* A quiet, scroll-linked view through Jerusalem's arches. All surfaces use
+   theme tokens so toggling the theme also changes the photographic treatment. */
+.sira-home-hero {
+  isolation: isolate;
+  --scene-base: #0d081f;
+  --scene-veil: #0d081fbd;
+  --scene-copy-veil: #0d081feb;
+  --scene-gold: #e5c158;
+  --scene-photo-opacity: .56;
+  --scene-photo-filter: saturate(.65) brightness(.8);
+  --scene-line-opacity: .22;
+  --scene-direction: 270deg;
+}
+.sira-home-hero:dir(ltr) { --scene-direction: 90deg; }
+.sira-jerusalem-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  --scene-drift: 0px;
+  --scene-near: 0px;
+  --scene-scale: 1;
+  background: var(--scene-base);
+}
+.sira-scene-photo {
+  position: absolute;
+  inset: -140px -5% -40px;
+  opacity: var(--scene-photo-opacity);
+  transform: translate3d(0, var(--scene-drift), 0) scale(var(--scene-scale));
+}
+.sira-scene-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 43%; filter: var(--scene-photo-filter); }
+.sira-scene-wash {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(var(--scene-direction), var(--scene-copy-veil) 3%, var(--scene-veil) 48%, transparent 100%), linear-gradient(0deg, var(--scene-base), transparent 65%);
+}
+.sira-scene-light {
+  position: absolute;
+  inset: -10%;
+  background: radial-gradient(ellipse at 48% 15%, #e5c15824, transparent 48%);
+  transform: translate3d(0, var(--scene-near), 0);
+}
+.sira-scene-arches {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: calc(100% + 65px);
+  stroke: var(--scene-gold);
+  stroke-width: 1;
+  opacity: var(--scene-line-opacity);
+  transform: translate3d(0, var(--scene-near), 0);
+}
+.sira-jerusalem-scene[data-moving="true"] .sira-scene-photo,
+.sira-jerusalem-scene[data-moving="true"] .sira-scene-arches { will-change: transform; }
+.sira-scene-fade { position: absolute; inset: 0; background: linear-gradient(0deg, var(--scene-base), transparent 24%); }
+.sira-scene-caption {
+  position: absolute;
+  z-index: 2;
+  bottom: 18px;
+  inset-inline: max(1rem, calc((100% - 1216px) / 2));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--scene-gold);
+  font-size: 11px;
+}
+.sira-scene-caption > span { display: inline-flex; align-items: center; gap: .65rem; }
+.sira-scene-toggle { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; padding: .5rem .85rem; border: 1px solid color-mix(in srgb, var(--scene-gold) 30%, transparent); border-radius: 999px; background: var(--scene-base); cursor: pointer; }
+.sira-scene-toggle:hover { border-color: var(--scene-gold); }
+.sira-theme-light .sira-home-hero {
+  --scene-base: #fff9ef;
+  --scene-veil: #fff9efb8;
+  --scene-copy-veil: #fff9eff2;
+  --scene-gold: #80531d;
+  --scene-photo-opacity: .62;
+  --scene-photo-filter: saturate(.55) sepia(.2);
+  --scene-line-opacity: .2;
+}
+@media (max-width: 767px) {
+  .sira-scene-photo { inset: -60px -25% -25px; }
+  .sira-scene-photo img { object-position: 53% top; }
+  .sira-scene-wash { background: linear-gradient(0deg, var(--scene-base) 8%, var(--scene-copy-veil) 50%, var(--scene-veil)); }
+  .sira-scene-arches { opacity: .13; }
+  .sira-scene-caption { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sira-jerusalem-scene .sira-scene-photo,
+  .sira-jerusalem-scene .sira-scene-arches,
+  .sira-jerusalem-scene .sira-scene-light { transform: none; will-change: auto; }
+  .sira-scene-toggle { display: none; }
+}
+
 /* Custom sleek scrollbar for Sira */
 ::-webkit-scrollbar {
   width: 6px;

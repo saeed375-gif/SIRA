@@ -3,6 +3,7 @@ import { SIRA_CATEGORIES } from '../data/jerusalemData';
 import React, { useState } from 'react';
 import { Place, Route, UserDiscoveryProgress } from '../types';
 import { JerusalemMap } from '../components/JerusalemMap';
+import { JerusalemBackdrop } from '../components/JerusalemBackdrop';
 import { 
   Navigation, 
   Map, 
@@ -46,12 +47,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
   return (
     <div className="min-h-screen bg-[#0D081F] text-[#FAF8F5] pb-24 md:pb-16 overflow-hidden">
       {/* HERO SECTION (Split: Story & Live Interactive Mini Map) */}
-      <section className="relative pt-6 md:pt-12 pb-12 md:pb-20 border-b border-[#24174B] overflow-hidden">
-        {/* Ambient atmospheric glows */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#381F78]/30 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/3 left-10 w-80 h-80 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
+      <section className="sira-home-hero relative pt-8 md:pt-16 pb-24 md:pb-28 border-b border-[#24174B] overflow-hidden">
+        <JerusalemBackdrop />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative z-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
             {/* Left Column (Content & Storytelling) */}
