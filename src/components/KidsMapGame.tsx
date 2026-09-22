@@ -3,6 +3,7 @@ import confetti from 'canvas-confetti';
 import { ArrowLeft, CheckCircle2, LockKeyhole, MapPin, Sparkles, Star, Trophy, XCircle } from 'lucide-react';
 import type { Place, UserDiscoveryProgress } from '../types';
 import { JerusalemMap } from './JerusalemMap';
+import { hasActiveGameCompletion } from '../lib/gameRewards';
 
 interface KidsMapGameProps {
   places: Place[];
@@ -83,8 +84,13 @@ export const KidsMapGame: React.FC<KidsMapGameProps> = ({
   const [finalRewardGranted, setFinalRewardGranted] = useState<boolean | null>(null);
   const mapPlaces = useMemo(() => STAGES.map((stage) => places.find((place) => place.slug === stage.slug)).filter(Boolean) as Place[], [places]);
   const kidsMapGame = progress.kidsMapGame || { completedStageIds: [], stagePoints: 0 };
-  const completedStageIds = kidsMapGame.completedStageIds || [];
-  const stagePoints = kidsMapGame.stagePoints || 0;
+  const resetExpiredCycle = !alreadyCompleted && Boolean(progress.gameCompletions?.['game:kids-map-v2'])
+    && !hasActiveGameCompletion(progress.gameCompletions, 'game:kids-map-v2');
+  const activeCycle = resetExpiredCycle
+    ? { ...kidsMapGame, completedStageIds: [], stagePoints: 0 }
+    : kidsMapGame;
+  const completedStageIds = activeCycle.completedStageIds || [];
+  const stagePoints = activeCycle.stagePoints || 0;
   const totalPoints = progress.totalPoints || 0;
   const entryFeePaid = Boolean(kidsMapGame.entryFeePaid || completedStageIds.length > 0);
   const canEnter = entryFeePaid || totalPoints >= ENTRY_COST || alreadyCompleted;

@@ -21,13 +21,13 @@ import { GamesView } from './views/GamesView';
 import { GamesAuthLoading, GamesAuthView } from './views/GamesAuthView';
 import { loadSiraDatabaseData } from './services/siraData';
 import { loadSiraProgress, restoreSiraSession, saveSiraProgress, signOutFromSira, syncSiraProgress, type SiraSession } from './services/auth';
+import { cleanGameCompletions, hasActiveGameCompletion } from './lib/gameRewards';
 import { Heart, Sparkles, MapPin, Compass, Navigation } from 'lucide-react';
 
 const STATIC_ALL_ROUTES = [...JERUSALEM_ROUTES, ...LIFE_ROUTES];
 const STORAGE_KEY_PROGRESS = 'sira_discovery_progress_v1';
 const STORAGE_KEY_FAVS = 'sira_favorites_v1';
 const STORAGE_KEY_THEME = 'sira_color_theme_v1';
-const KIDS_MAP_STAGE_PREFIX = 'kids-map-stage:';
 type SiraTheme = 'dark' | 'light';
 
 const DEFAULT_PROGRESS: UserDiscoveryProgress = {
@@ -58,7 +58,10 @@ const normalizeProgress = (value: unknown): UserDiscoveryProgress => {
   return {
     totalPoints: Math.max(0, Math.min(1_000_000, Math.floor(Number(source.totalPoints) || DEFAULT_PROGRESS.totalPoints))),
     discoveredPlaceIds: uniqueStrings(source.discoveredPlaceIds),
-    completedChallenges: uniqueStrings(source.completedChallenges, 500),
+    // Game completions used to be stored permanently with other challenges.
+    // Drop those legacy entries so every account starts this daily reward cycle fresh.
+    completedChallenges: uniqueStrings(source.completedChallenges, 500).filter((id) => !id.startsWith('game:')),
+    gameCompletions: cleanGameCompletions(source.gameCompletions),
     favoritePlaceIds: uniqueStrings(source.favoritePlaceIds),
     journeys,
     kidsMapGame: {
@@ -284,13 +287,13 @@ export default function App() {
 
   // Games use the same platform balance shown everywhere else in Sira.
   const handleGameComplete = (gameId: string, points: number) => {
-    if ((progress.completedChallenges || []).includes(gameId)) return false;
+    if (hasActiveGameCompletion(progress.gameCompletions, gameId)) return false;
     setProgress((prev) => {
-      if ((prev.completedChallenges || []).includes(gameId)) return prev;
+      if (hasActiveGameCompletion(prev.gameCompletions, gameId)) return prev;
       return {
         ...prev,
         totalPoints: prev.totalPoints + points,
-        completedChallenges: [...(prev.completedChallenges || []), gameId],
+        gameCompletions: { ...(prev.gameCompletions || {}), [gameId]: new Date().toISOString() },
       };
     });
     return true;
@@ -316,14 +319,20 @@ export default function App() {
   };
 
   const handleKidsMapStageComplete = (stageId: string) => {
-    const stageKey = `${KIDS_MAP_STAGE_PREFIX}${stageId}`;
-    if ((progress.completedChallenges || []).includes(stageKey)) return false;
+    const isNewDailyCycle = !hasActiveGameCompletion(progress.gameCompletions, 'game:kids-map-v2')
+      && Boolean(progress.gameCompletions?.['game:kids-map-v2']);
+    const currentKidsMap = progress.kidsMapGame || { completedStageIds: [], stagePoints: 0 };
+    if (!isNewDailyCycle && currentKidsMap.completedStageIds.includes(stageId)) return false;
     setProgress((prev) => {
-      if ((prev.completedChallenges || []).includes(stageKey)) return prev;
-      const kidsMapGame = prev.kidsMapGame || { completedStageIds: [], stagePoints: 0 };
+      const previousKidsMap = prev.kidsMapGame || { completedStageIds: [], stagePoints: 0 };
+      const resetExpiredCycle = !hasActiveGameCompletion(prev.gameCompletions, 'game:kids-map-v2')
+        && Boolean(prev.gameCompletions?.['game:kids-map-v2']);
+      const kidsMapGame = resetExpiredCycle
+        ? { ...previousKidsMap, completedStageIds: [], stagePoints: 0 }
+        : previousKidsMap;
+      if (kidsMapGame.completedStageIds.includes(stageId)) return prev;
       return {
         ...prev,
-        completedChallenges: [...(prev.completedChallenges || []), stageKey],
         kidsMapGame: {
           ...kidsMapGame,
           completedStageIds: [...kidsMapGame.completedStageIds, stageId],

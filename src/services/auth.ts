@@ -13,6 +13,7 @@ export interface SiraSession {
 export interface SiraProgressSnapshot {
   discoveredPlaceIds: string[];
   completedChallenges: string[];
+  gameCompletions?: Record<string, string>;
   totalPoints: number;
   favoritePlaceIds: string[];
   journeys?: Record<string, { revealedStopNumbers: number[]; completedAt?: string }>;

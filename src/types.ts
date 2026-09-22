@@ -131,6 +131,8 @@ export interface SiraJourneyProgress {
 export interface UserDiscoveryProgress {
   discoveredPlaceIds: string[];
   completedChallenges: string[];
+  /** Each game's last rewarded completion. A reward becomes available again after 24 hours. */
+  gameCompletions?: Record<string, string>;
   totalPoints: number;
   favoritePlaceIds: string[];
   /** The chapters a visitor has uncovered in each connected Sira journey. */

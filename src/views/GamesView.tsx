@@ -9,6 +9,7 @@ import {
 import type { Place, Route, UserDiscoveryProgress } from '../types';
 import type { SiraUser } from '../services/auth';
 import { KidsMapGame } from '../components/KidsMapGame';
+import { GAME_REWARD_COOLDOWN_MS, hasActiveGameCompletion } from '../lib/gameRewards';
 
 type GameId = 'blitz' | 'memory' | 'timeline' | 'compass' | 'vault' | 'kids-map';
 
@@ -132,8 +133,8 @@ const GameResult: React.FC<{
     <h2 className="font-serif-ar text-3xl font-bold mt-2">{title}</h2>
     <p className="text-sm text-[#C4B7D8] leading-relaxed mt-3">{message}</p>
     {!failed && rewardGranted !== false && <div className="font-num text-4xl text-[#E5C158] mt-5">+{points}</div>}
-    {!failed && rewardGranted === false && <p className="text-[11px] text-[#8F82A3] mt-4">أُنجزت اللعبة مجددًا. الاحتفال مستمر، لكن لا تُضاف نقاط عند الإعادة.</p>}
-    {alreadyCompleted && rewardGranted === undefined && !failed && <p className="text-[11px] text-[#8F82A3] mt-2">أفضل نتيجة محفوظة؛ نقاط الرصيد الأساسية تُحتسب مرة واحدة.</p>}
+    {!failed && rewardGranted === false && <p className="text-[11px] text-[#8F82A3] mt-4">حصلت على مكافأة هذه اللعبة بالفعل. تعود المكافأة بعد 24 ساعة من آخر إكمال.</p>}
+    {alreadyCompleted && rewardGranted === undefined && !failed && <p className="text-[11px] text-[#8F82A3] mt-2">مكافأة هذه اللعبة متاحة مجددًا بعد 24 ساعة من آخر إكمال.</p>}
     <div className="flex flex-wrap justify-center gap-3 mt-8">
       <button onClick={onRestart} className="inline-flex items-center gap-2 rounded-xl border border-[#4B3689] px-5 py-3 text-sm font-bold hover:border-[#E5C158]"><RotateCcw className="w-4 h-4" /> العب مجددًا</button>
       <button onClick={onBack} className="inline-flex items-center gap-2 rounded-xl bg-[#E5C158] px-5 py-3 text-sm font-bold text-[#110B29] hover:bg-[#FFE79A]">تحدٍ آخر <ArrowLeft className="w-4 h-4" /></button>
@@ -406,11 +407,26 @@ const celebrateGame = () => {
 export const GamesView: React.FC<GamesViewProps> = ({ places, progress, onNavigate, onGameComplete, onKidsMapEntry, onKidsMapStageComplete, user, onSignOut }) => {
   const [activeGame, setActiveGame] = useState<GameId | null>(null);
   const [runRewards, setRunRewards] = useState<Partial<Record<GameId, boolean>>>({});
+  const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [activeGame]);
+  useEffect(() => {
+    // A game may be completed long after this screen mounted, so refresh the
+    // clock before scheduling its exact 24-hour reset.
+    setNow(Date.now());
+  }, [progress.gameCompletions]);
+  useEffect(() => {
+    const gameCompletions: Record<string, string> = progress.gameCompletions || {};
+    const nextExpiry = Math.min(...Object.values(gameCompletions)
+      .map((completedAt) => Date.parse(completedAt) + GAME_REWARD_COOLDOWN_MS)
+      .filter((expiry) => Number.isFinite(expiry) && expiry > now));
+    if (!Number.isFinite(nextExpiry)) return undefined;
+    const timer = window.setTimeout(() => setNow(Date.now()), Math.max(100, nextExpiry - now + 20));
+    return () => window.clearTimeout(timer);
+  }, [now, progress.gameCompletions]);
   const gameKey = (id: GameId) => `game:${id}-v2`;
-  const completed = (id: GameId) => progress.completedChallenges.includes(gameKey(id));
+  const completed = (id: GameId) => hasActiveGameCompletion(progress.gameCompletions, gameKey(id), now);
   const startGame = (id: GameId) => {
     const kidsMapStarted = Boolean(progress.kidsMapGame?.entryFeePaid || progress.kidsMapGame?.completedStageIds.length);
     if (id === 'kids-map' && !kidsMapStarted && !completed('kids-map') && !onKidsMapEntry()) return;

@@ -62,6 +62,7 @@ function validEmail(email: string) {
 type ProgressSnapshot = {
   discoveredPlaceIds: string[];
   completedChallenges: string[];
+  gameCompletions: Record<string, string>;
   totalPoints: number;
   favoritePlaceIds: string[];
   journeys: Record<string, { revealedStopNumbers: number[]; completedAt?: string }>;
@@ -74,6 +75,11 @@ const uniqueStrings = (value: unknown, maximum = 250) => Array.from(new Set(
 const uniqueNumbers = (value: unknown, maximum = 50) => Array.from(new Set(
   Array.isArray(value) ? value.map(Number).filter(Number.isInteger) : [],
 )).slice(0, maximum);
+const cleanGameCompletions = (value: unknown) => Object.fromEntries(
+  value && typeof value === 'object' ? Object.entries(value as Record<string, unknown>)
+    .filter(([gameId, completedAt]) => gameId.startsWith('game:') && gameId.length <= 160 && typeof completedAt === 'string' && Number.isFinite(Date.parse(completedAt)))
+    .slice(0, 20) : [],
+) as Record<string, string>;
 
 function cleanProgress(value: unknown): ProgressSnapshot | null {
   if (!value || typeof value !== 'object') return null;
@@ -88,7 +94,8 @@ function cleanProgress(value: unknown): ProgressSnapshot | null {
   return {
     totalPoints: Math.max(0, Math.min(1_000_000, Math.floor(Number(source.totalPoints) || 50))),
     discoveredPlaceIds: uniqueStrings(source.discoveredPlaceIds),
-    completedChallenges: uniqueStrings(source.completedChallenges, 500),
+    completedChallenges: uniqueStrings(source.completedChallenges, 500).filter((id) => !id.startsWith('game:')),
+    gameCompletions: cleanGameCompletions(source.gameCompletions),
     favoritePlaceIds: uniqueStrings(source.favoritePlaceIds),
     journeys,
     kidsMapGame: {
@@ -109,10 +116,15 @@ function mergeProgress(existing: ProgressSnapshot | null, incoming: ProgressSnap
       ...(previous?.completedAt || journey.completedAt ? { completedAt: previous?.completedAt || journey.completedAt } : {}),
     };
   }
+  const gameCompletions = { ...existing.gameCompletions };
+  for (const [gameId, completedAt] of Object.entries(incoming.gameCompletions)) {
+    if (!gameCompletions[gameId] || Date.parse(completedAt) > Date.parse(gameCompletions[gameId])) gameCompletions[gameId] = completedAt;
+  }
   return {
     totalPoints: Math.max(existing.totalPoints, incoming.totalPoints),
     discoveredPlaceIds: uniqueStrings([...existing.discoveredPlaceIds, ...incoming.discoveredPlaceIds]),
-    completedChallenges: uniqueStrings([...existing.completedChallenges, ...incoming.completedChallenges], 500),
+    completedChallenges: uniqueStrings([...existing.completedChallenges, ...incoming.completedChallenges], 500).filter((id) => !id.startsWith('game:')),
+    gameCompletions,
     favoritePlaceIds: uniqueStrings([...existing.favoritePlaceIds, ...incoming.favoritePlaceIds]),
     journeys,
     kidsMapGame: {
