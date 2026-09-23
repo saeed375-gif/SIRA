@@ -585,7 +585,7 @@ export default function App() {
                 </li>
                 <li>
                   <a href="/image-credits.html" target="_blank" rel="noopener noreferrer" className="hover:text-[#E5C158] transition-colors">
-                    مصادر الصور وتراخيصها
+                    مصادر الصور والفيديو وتراخيصها
                   </a>
                 </li>
               </ul>

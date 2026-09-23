@@ -46,80 +46,43 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   return (
     <div className="min-h-screen bg-[#0D081F] text-[#FAF8F5] pb-24 md:pb-16 overflow-hidden">
-      {/* HERO SECTION (Split: Story & Live Interactive Mini Map) */}
-      <section className="sira-home-hero relative pt-8 md:pt-16 pb-24 md:pb-28 border-b border-[#24174B] overflow-hidden">
+      <section className="sira-cinema-hero" aria-label="عِش حكاية القدس">
         <JerusalemBackdrop />
-
-        <div className="relative z-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            
-            {/* Left Column (Content & Storytelling) */}
-            <div className="lg:col-span-6 text-right space-y-6">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#18103A] border border-[#D4AF37]/40 text-xs font-bold text-[#E5C158] shadow-md shadow-[#D4AF37]/10">
-                <span className="w-2 h-2 rounded-full bg-[#E5C158] animate-ping" />
-                <span>تجربة رقمية حية لاكتشاف القدس</span>
-              </div>
-
-              {/* Main Headline */}
-              <div className="space-y-2">
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#FAF8F5] leading-tight tracking-tight font-serif-ar">
-                  لا تكتفِ برؤية القدس...
-                  <br />
-                  <span className="sira-hero-title-highlight text-transparent bg-clip-text bg-gradient-to-l from-[#E5C158] via-[#F3D77A] to-[#FAF8F5]">
-                    عِش حكايتها
-                  </span>
-                </h1>
-                <p className="text-sm font-semibold text-[#D4AF37] tracking-wider">
-                  كل مكان يحمل حكاية • وكل حجر يشهد على تاريخ
-                </p>
-              </div>
-
-              {/* Subtitle description */}
-              <p className="text-sm sm:text-base text-[#D8CDE8] leading-relaxed max-w-xl">
-                «سيرة» ليست مجرد منصة معلومات، بل رحلة تفاعلية حية تربط أزقة القدس العتيقة بحكاياتها، وتاريخها، ودينها، وجغرافيتها، وذاكرتها وحياتها اليومية عبر خريطة تفاعلية وحكايات مرتبطة بالمكان.
-              </p>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <button
-                  id="hero-start-journey-btn"
-                  onClick={() => onNavigate(`/routes/${featuredRoute.slug}`)}
-                  className="flex items-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#E5C158] hover:from-[#E5C158] hover:to-[#FFE79A] text-[#110B29] font-bold text-sm shadow-xl shadow-[#D4AF37]/25 transition-all active:scale-95"
-                >
-                  <Footprints className="w-4 h-4" />
-                  <span>ابدأ رحلتك</span>
-                </button>
-
-                <button
-                  id="hero-explore-map-btn"
-                  onClick={() => onNavigate('/explore')}
-                  className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#18103A] hover:bg-[#251854] text-[#FAF8F5] font-bold text-sm border border-[#3C2975] hover:border-[#D4AF37]/60 shadow-xl transition-all active:scale-95"
-                >
-                  <Map className="w-4 h-4 text-[#E5C158]" />
-                  <span>استكشف الخريطة</span>
-                </button>
-              </div>
-
-              {/* Quick stats / Features tick */}
-              <div className="pt-4 border-t border-[#24174B] grid grid-cols-3 gap-4 text-xs text-[#A89CB9]">
-                <div>
-                  <span className="block text-lg font-bold text-[#E5C158] font-num">144</span>
-                  <span>دونماً من القداسة</span>
-                </div>
-                <div>
-                  <span className="block text-lg font-bold text-[#FAF8F5] font-num">04</span>
-                  <span>محطات في المسار</span>
-                </div>
-                <div>
-                  <span className="block text-lg font-bold text-[#E5C158] font-num">الحياة</span>
-                  <span>طبقة جديدة للاكتشاف</span>
-                </div>
-              </div>
+        <div className="sira-cinema-content">
+          <div className="sira-cinema-copy">
+            <span className="sira-cinema-eyebrow"><span /> القدس، أقرب مما تتخيّل</span>
+            <h1 className="font-serif-ar">لا تكتفِ برؤية القدس.<br /><em>عِش حكايتها.</em></h1>
+            <p>من عتبة الباب إلى قلب الأزقة. اكتشف مدينةً يحمل كل حجر فيها حكاية، وكل طريق فيها بداية.</p>
+            <div className="sira-cinema-actions">
+              <button id="hero-start-journey-btn" className="sira-cinema-primary" onClick={() => onNavigate(`/routes/${featuredRoute.slug}`)}>
+                <Footprints size={18} /><span>ابدأ رحلتك</span><ArrowLeft size={17} />
+              </button>
+              <button id="hero-explore-map-btn" className="sira-cinema-secondary" onClick={() => onNavigate('/explore')}>
+                <Map size={18} /><span>استكشف الخريطة</span>
+              </button>
             </div>
+          </div>
+        </div>
+        <div className="sira-cinema-footer">
+          <a href="#home-live-map" className="sira-cinema-scroll"><span className="sira-scroll-mark" /> مرّر لتبدأ الحكاية</a>
+          <span className="sira-cinema-location">القدس <span> / </span> البلدة القديمة</span>
+        </div>
+        <div className="sira-cinema-progress" aria-hidden="true"><span /></div>
+      </section>
 
-            {/* Right Column (Hero Mini Interactive Live Map & Quick Card) */}
-            <div className="lg:col-span-6 relative">
+      <section id="home-live-map" className="py-12 md:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <div className="lg:col-span-4 space-y-5">
+            <span className="life-eyebrow">من المشهد إلى المكان</span>
+            <h2 className="text-3xl md:text-4xl font-serif-ar font-bold">المدينة بين يديك</h2>
+            <p className="text-sm leading-loose text-[#D8CDE8]">اختر محطتك على الخريطة، واسمع حكايتها، ثم اتبع الطريق إلى الحكاية التالية. من باب العمود تبدأ رحلتك في قلب القدس.</p>
+            <div className="grid grid-cols-2 gap-5 border-t border-[#D4AF37]/25 pt-5">
+              <div><span className="block text-2xl text-[#E5C158] font-num">{String(featuredRoute.stops.length).padStart(2, '0')}</span><span className="text-xs text-[#A89CB9]">محطات في المسار</span></div>
+              <div><span className="block text-2xl text-[#E5C158] font-serif-ar">حكاية واحدة</span><span className="text-xs text-[#A89CB9]">تجمع المكان والناس والذاكرة</span></div>
+            </div>
+          </div>
+            {/* Live map follows the film, keeping both experiences easy to use. */}
+            <div className="lg:col-span-8 relative">
               <div className="relative rounded-3xl p-2.5 bg-gradient-to-b from-[#2D1F5B] to-[#160E36] border border-[#D4AF37]/35 shadow-2xl overflow-hidden">
                 
                 {/* Mini Top Banner */}
@@ -152,7 +115,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   />
                 </div>
 
-                {/* Floating Quick Route Stepper inside Hero */}
+                {/* Route stops remain directly accessible below the map. */}
                 <div className="sira-map-stepper p-3 bg-[#110B29]/90 border-t border-[#24174B] rounded-b-2xl flex items-center justify-between gap-2 text-xs">
                   <span className="text-[#A89CB9] font-medium hidden sm:inline">
                     محطات المسار المفتوح:
@@ -183,7 +146,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </div>
             </div>
 
-          </div>
         </div>
       </section>
 

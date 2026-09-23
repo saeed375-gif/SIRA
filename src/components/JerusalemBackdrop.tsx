@@ -1,89 +1,120 @@
-import { useEffect, useRef, useState } from 'react';
-import { ArrowDown, Pause, Play } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 
-/** Decorative layers follow native scrolling; content and the map stay still. */
+/** Real footage plays quietly; native scrolling moves through the film itself. */
 export function JerusalemBackdrop() {
   const sceneRef = useRef<HTMLDivElement>(null);
-  const [paused, setPaused] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const scene = sceneRef.current;
+    const video = videoRef.current;
     const hero = scene?.parentElement;
-    if (!scene || !hero) return;
+    if (!scene || !video || !hero) return;
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const mobile = window.matchMedia('(max-width: 767px)');
-    let frame = 0;
     let visible = false;
-    let listening = false;
-
+    let disposed = false;
+    let frame = 0;
+    let resumeTimer = 0;
+    let scrolling = false;
+    let resumeAfterSeek = false;
+    let targetTime = 0;
+    let previousY = window.scrollY;
+    let loaded = false;
+    const canMove = () => visible && !document.hidden && !reducedMotion.matches && !disposed;
+    const play = () => {
+      if (!canMove() || scrolling) return;
+      video.playbackRate = 0.85;
+      void video.play().catch(() => { /* The poster remains if autoplay is unavailable. */ });
+    };
+    const seek = () => {
+      if (!canMove() || !scrolling || video.seeking || !Number.isFinite(video.duration)) return;
+      if (Math.abs(video.currentTime - targetTime) > 0.045) video.currentTime = targetTime;
+    };
     const paint = () => {
       frame = 0;
       const bounds = hero.getBoundingClientRect();
       const progress = Math.min(1, Math.max(0, -bounds.top / bounds.height));
-      const strength = mobile.matches ? 0.35 : 1;
-      scene.style.setProperty('--scene-drift', `${progress * 115 * strength}px`);
-      scene.style.setProperty('--scene-near', `${progress * -55 * strength}px`);
-      scene.style.setProperty('--scene-scale', `${1 + progress * 0.055 * strength}`);
+      hero.style.setProperty('--cinema-progress', String(progress));
+      seek();
     };
-    const schedule = () => { if (!frame) frame = requestAnimationFrame(paint); };
-    const stop = () => {
-      window.removeEventListener('scroll', schedule);
-      window.removeEventListener('resize', schedule);
-      cancelAnimationFrame(frame);
-      frame = 0;
-      listening = false;
+    const onSeeked = () => {
+      seek();
+      if (resumeAfterSeek && !video.seeking) {
+        scrolling = false;
+        resumeAfterSeek = false;
+        play();
+      }
+    };
+    const onScroll = () => {
+      const delta = window.scrollY - previousY;
+      previousY = window.scrollY;
+      if (!canMove()) return;
+      if (!frame) frame = requestAnimationFrame(paint);
+      if (Math.abs(delta) < 1 || video.readyState < 2 || !Number.isFinite(video.duration)) return;
+      if (!scrolling) targetTime = video.currentTime;
+      scrolling = true;
+      resumeAfterSeek = false;
+      video.pause();
+      const duration = Math.max(0.1, video.duration - 0.1);
+      // Short GOPs in the encoded clip keep both forward and reverse seeks quick.
+      targetTime = ((targetTime + delta * 0.012) % duration + duration) % duration;
+      window.clearTimeout(resumeTimer);
+      resumeTimer = window.setTimeout(() => {
+        resumeAfterSeek = true;
+        onSeeked();
+      }, 220);
     };
     const sync = () => {
-      stop();
-      if (reducedMotion.matches) {
-        scene.style.removeProperty('--scene-drift');
-        scene.style.removeProperty('--scene-near');
-        scene.style.removeProperty('--scene-scale');
-      } else if (!paused && visible) {
-        window.addEventListener('scroll', schedule, { passive: true });
-        window.addEventListener('resize', schedule);
-        listening = true;
-        schedule();
-      }
-      scene.dataset.moving = String(listening);
+      previousY = window.scrollY;
+      window.removeEventListener('scroll', onScroll);
+      window.clearTimeout(resumeTimer);
+      cancelAnimationFrame(frame);
+      frame = 0;
+      scrolling = false;
+      resumeAfterSeek = false;
+      if (canMove()) {
+        if (!loaded) {
+          // Choose one source per visit so resizing and theme changes never restart it.
+          video.src = window.matchMedia('(max-width: 767px)').matches
+            ? '/video/jerusalem-cinema-mobile.mp4'
+            : '/video/jerusalem-cinema.mp4';
+          video.load();
+          loaded = true;
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        paint();
+        play();
+      } else video.pause();
+      scene.dataset.active = String(canMove());
     };
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       sync();
     });
     observer.observe(hero);
+    video.addEventListener('seeked', onSeeked);
+    video.addEventListener('canplay', play);
+    document.addEventListener('visibilitychange', sync);
     reducedMotion.addEventListener('change', sync);
     return () => {
-      stop();
+      disposed = true;
       observer.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      document.removeEventListener('visibilitychange', sync);
       reducedMotion.removeEventListener('change', sync);
+      video.removeEventListener('seeked', onSeeked);
+      video.removeEventListener('canplay', play);
+      window.clearTimeout(resumeTimer);
+      cancelAnimationFrame(frame);
+      video.pause();
     };
-  }, [paused]);
+  }, []);
 
   return (
-    <>
-      <div ref={sceneRef} className="sira-jerusalem-scene" aria-hidden="true">
-        <div className="sira-scene-photo">
-          <img src="/images/jerusalem/dome-and-chain.jpg" alt="" width="1280" height="852" decoding="async" />
-        </div>
-        <div className="sira-scene-wash" />
-        <div className="sira-scene-light" />
-        <svg className="sira-scene-arches" viewBox="0 0 1440 780" preserveAspectRatio="xMidYMax slice" fill="none">
-          <path d="M-95 800V385C-95 180 65 76 210 20C355 76 515 180 515 385V800 M-62 800V389C-62 203 81 106 210 53C339 106 482 203 482 389V800" />
-          <path d="M1120 800V440C1120 283 1247 200 1360 156C1473 200 1600 283 1600 440V800 M1144 800V444C1144 302 1260 225 1360 185C1460 225 1576 302 1576 444V800" />
-          <path d="M-40 704C280 644 420 794 728 725S1145 626 1480 688" strokeDasharray="2 11" />
-          <circle cx="210" cy="53" r="5" /><circle cx="1360" cy="185" r="4" />
-        </svg>
-        <div className="sira-scene-fade" />
-      </div>
-      <div className="sira-scene-caption">
-        <span><ArrowDown size={14} aria-hidden="true" /> مع كل خطوة، حكاية</span>
-        <button type="button" className="sira-scene-toggle" onClick={() => setPaused((value) => !value)} aria-pressed={paused} aria-label={paused ? 'تشغيل حركة الخلفية' : 'إيقاف حركة الخلفية'}>
-          {paused ? <Play size={13} aria-hidden="true" /> : <Pause size={13} aria-hidden="true" />}
-          <span>{paused ? 'تشغيل الحركة' : 'إيقاف الحركة'}</span>
-        </button>
-      </div>
-    </>
+    <div ref={sceneRef} className="sira-cinema-backdrop" aria-hidden="true">
+      <video ref={videoRef} muted loop playsInline preload="none" poster="/video/jerusalem-cinema-poster.jpg" disablePictureInPicture tabIndex={-1} />
+      <div className="sira-cinema-shade" />
+    </div>
   );
 }
