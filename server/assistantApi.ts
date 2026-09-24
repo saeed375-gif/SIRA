@@ -8,7 +8,7 @@ type ChatTurn = { role: 'user' | 'assistant'; content: string };
 type AssistantLanguage = 'ar' | 'en' | 'pt' | 'tr' | 'ru' | 'fr' | 'zh-CN' | 'ja' | 'ko';
 type PlatformPlace = { slug?: string; name_ar?: string | null; short_description_ar?: string | null; district_ar?: string | null };
 type PlatformRoute = { slug?: string; title_ar?: string | null; subtitle_ar?: string | null; description_ar?: string | null; estimated_minutes?: number | null; distance_km?: number | string | null };
-type PlatformStory = { title_ar?: string | null; excerpt_ar?: string | null; description_ar?: string | null; place?: { slug?: string; name_ar?: string | null } | null };
+type PlatformStory = { title_ar?: string | null; short_description_ar?: string | null; story_ar?: string | null; place?: { slug?: string; name_ar?: string | null } | null };
 type AssistantKnowledge = { context: string; places: Array<{ name: string; slug: string }>; routes: Array<{ title: string; slug: string }> };
 
 const router = Router();
@@ -67,7 +67,7 @@ async function getKnowledge(): Promise<AssistantKnowledge> {
     const [places, routes, stories] = await Promise.all([
       supabaseFetch<PlatformPlace[]>(restPath('places', { select: 'slug,name_ar,short_description_ar,district_ar', status: 'eq.published', order: 'featured.desc,name_ar.asc', limit: 60 })),
       supabaseFetch<PlatformRoute[]>(restPath('routes', { select: 'slug,title_ar,subtitle_ar,description_ar,estimated_minutes,distance_km', status: 'eq.published', order: 'featured.desc,created_at.asc', limit: 30 })),
-      supabaseFetch<PlatformStory[]>(restPath('life_stories', { select: 'title_ar,excerpt_ar,description_ar,place:places(slug,name_ar)', status: 'eq.published', order: 'featured.desc,sort_order.asc', limit: 30 })),
+      supabaseFetch<PlatformStory[]>(restPath('life_stories', { select: 'title_ar,short_description_ar,story_ar,place:places(slug,name_ar)', status: 'eq.published', order: 'featured.desc,sort_order.asc', limit: 30 })),
     ]);
     const placeIndex = places.map((place) => ({ name: cleanText(place.name_ar, 100), slug: cleanText(place.slug, 120) })).filter((place) => place.name && place.slug);
     const routeIndex = routes.map((route) => ({ title: cleanText(route.title_ar, 120), slug: cleanText(route.slug, 120) })).filter((route) => route.title && route.slug);
@@ -77,7 +77,7 @@ async function getKnowledge(): Promise<AssistantKnowledge> {
       'مسارات سِيرة المنشورة:',
       ...routes.map(describeRoute).filter(Boolean).map((line) => `- ${line}`),
       'حكايات الحياة المنشورة:',
-      ...stories.map((story) => [cleanText(story.title_ar, 120), cleanText(story.place?.name_ar, 100) && `مرتبطة بـ${cleanText(story.place?.name_ar, 100)}`, cleanText(story.excerpt_ar || story.description_ar, 350)].filter(Boolean).join(' — ')).filter(Boolean).map((line) => `- ${line}`),
+      ...stories.map((story) => [cleanText(story.title_ar, 120), cleanText(story.place?.name_ar, 100) && `مرتبطة بـ${cleanText(story.place?.name_ar, 100)}`, cleanText(story.short_description_ar || story.story_ar, 350)].filter(Boolean).join(' — ')).filter(Boolean).map((line) => `- ${line}`),
       'أقسام المنصة: الخريطة /explore، المسارات /routes، الألعاب /games، البحث /search، صفحة التوثيق /about.',
     ].join('\n').slice(0, 28_000);
     const value = { context, places: placeIndex, routes: routeIndex };
@@ -123,6 +123,12 @@ const instructions = (knowledge: string, language: AssistantLanguage) => `أنت
 ${knowledge}
 </مرجع_سيرة>`;
 
+function isTemporaryGeminiFailure(error: unknown) {
+  const details = error as { status?: unknown; error?: { code?: unknown } } | null;
+  const status = Number(details?.status ?? details?.error?.code);
+  return status === 429 || status === 503;
+}
+
 router.post('/chat', rateLimit(12, 60_000), async (req, res, next) => {
   try {
     // This is a controlled product state, not an application failure. Return a
@@ -134,12 +140,12 @@ router.post('/chat', rateLimit(12, 60_000), async (req, res, next) => {
     const language = readLanguage(req.body?.language);
     const knowledge = await getKnowledge();
     const client = new GoogleGenAI({ apiKey: config.geminiApiKey });
-    const response = await client.models.generateContent({
-      model: config.geminiModel,
-      contents: [
-        ...history.map((turn) => ({ role: turn.role === 'assistant' ? 'model' : 'user', parts: [{ text: turn.content }] })),
-        { role: 'user', parts: [{ text: message }] },
-      ],
+    const contents = [
+      ...history.map((turn) => ({ role: turn.role === 'assistant' ? 'model' : 'user', parts: [{ text: turn.content }] })),
+      { role: 'user', parts: [{ text: message }] },
+    ];
+    const request = {
+      contents,
       config: {
         systemInstruction: instructions(knowledge.context, language),
         temperature: 0.2,
@@ -151,7 +157,15 @@ router.post('/chat', rateLimit(12, 60_000), async (req, res, next) => {
           HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
         ].map((category) => ({ category, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE })),
       },
-    });
+    };
+    let response;
+    try {
+      response = await client.models.generateContent({ ...request, model: config.geminiModel });
+    } catch (error) {
+      if (!isTemporaryGeminiFailure(error) || config.geminiFallbackModel === config.geminiModel) throw error;
+      console.warn('[Sira assistant] Primary Gemini model is temporarily unavailable; trying fallback model.');
+      response = await client.models.generateContent({ ...request, model: config.geminiFallbackModel });
+    }
     const wasBlocked = Boolean(response.promptFeedback?.blockReason || response.candidates?.some((candidate) => candidate.finishReason === 'SAFETY'));
     if (wasBlocked) return res.status(400).json({ error: 'لا يمكنني متابعة هذا الطلب. يمكنني مساعدتك في استكشاف محتوى سِيرة.' });
     const answer = cleanText(response.text, 3_200);

@@ -11,6 +11,8 @@ export const config = {
   // Server-only. Never expose this through Vite's VITE_* variables.
   geminiApiKey: read('GEMINI_API_KEY'),
   geminiModel: read('GEMINI_MODEL', 'gemini-3.8-flash'),
+  // A lower-latency backup used only when Gemini reports temporary capacity limits.
+  geminiFallbackModel: read('GEMINI_FALLBACK_MODEL', 'gemini-3.5-flash-lite'),
 };
 
 export const hasSupabase = () => Boolean(config.supabaseUrl && config.supabaseAnonKey);
