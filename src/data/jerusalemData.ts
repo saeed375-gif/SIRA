@@ -72,6 +72,16 @@ export const JERUSALEM_PLACES: Place[] = [
         { time: 180, text: 'انزل الدرجات، وتنشق رائحة الخان والبهارات التي تفتح لك أبواب التاريخ.' }
       ]
     },
+    videoStory: {
+      title: 'حركة باب العمود',
+      description: 'لقطة حية قصيرة للبوابة ومدرجها الحجري؛ شاهد المكان قبل أن تبدأ رحلتك داخله.',
+      durationSeconds: 12,
+      videoUrl: '/video/places/bab-al-amoud.mp4',
+      posterUrl: '/video/places/bab-al-amoud.jpg',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Damascus_Gate_VIDEO.ogv',
+      sourceLabel: 'Wikimedia Commons · Eranf',
+      license: 'CC BY-SA 3.0',
+    },
     nearbyPlaces: [
       {
         placeId: 'p-2',
@@ -224,6 +234,16 @@ export const JERUSALEM_PLACES: Place[] = [
         { time: 130, text: 'استدر يميناً لتصل إلى حارة النصارى والقيامة، أو واصل إلى الأقصى.' }
       ]
     },
+    videoStory: {
+      title: 'خطوات بين أزقة البلدة القديمة',
+      description: 'مشهد حي قصير يلتقط ضوء الحجر وحركة الممرات التي تصنع إيقاع الأسواق المقدسية.',
+      durationSeconds: 6,
+      videoUrl: '/video/places/khan-al-zait.mp4',
+      posterUrl: '/video/places/khan-al-zait.jpg',
+      sourceUrl: 'https://www.pexels.com/video/women-walking-down-the-street-with-old-houses-2841847/',
+      sourceLabel: 'Pexels · Sophie Merceron',
+      license: 'Pexels License',
+    },
     nearbyPlaces: [
       {
         placeId: 'p-1',
@@ -359,6 +379,16 @@ export const JERUSALEM_PLACES: Place[] = [
         { time: 155, text: 'عمر بن الخطاب وصفرونيوس كتبا هنا دستور الإخاء الإنساني الأبدي...' },
         { time: 195, text: 'تأمل السلم الخشبي على الواجهة، رمز السلام والوضع الراهن.' }
       ]
+    },
+    videoStory: {
+      title: 'في الحي المسيحي قرب القيامة',
+      description: 'لقطة حية من محيط كنيسة القيامة، تضع حكاية الحجر والعبادة في سياقها المقدسي.',
+      durationSeconds: 12,
+      videoUrl: '/video/places/holy-sepulchre.mp4',
+      posterUrl: '/video/places/holy-sepulchre.jpg',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:METOXION_-_Gethsemane_Church_next_to_the_Church_of_the_Holy_Sepulchre.ogv',
+      sourceLabel: 'Wikimedia Commons · Eranf',
+      license: 'CC BY-SA 3.0',
     },
     nearbyPlaces: [
       {
@@ -500,6 +530,16 @@ export const JERUSALEM_PLACES: Place[] = [
         { time: 165, text: 'الزيتون المعمر هنا شهد مواكب صلاح الدين والعلماء وأجيال المرابطين...' },
         { time: 220, text: 'كل خطوة هنا هي قصة، وكل مئذنة شاهدة على خلود هذه الأرض.' }
       ]
+    },
+    videoStory: {
+      title: 'إيقاع باحات الأقصى',
+      description: 'مشهد زمني حقيقي لقبة الصخرة وحركة الساحة، يعرض المكان كما يعيش في لحظته اليومية.',
+      durationSeconds: 12,
+      videoUrl: '/video/places/al-aqsa-mosque.mp4',
+      posterUrl: '/video/places/al-aqsa-mosque.jpg',
+      sourceUrl: 'https://www.pexels.com/video/people-outside-the-dome-of-the-rock-4202514/',
+      sourceLabel: 'Pexels · Abimelec Castillo',
+      license: 'Pexels License',
     },
     nearbyPlaces: [
       {
@@ -645,6 +685,16 @@ export const JERUSALEM_PLACES: Place[] = [
         { time: 145, text: 'من هنا ترى قبة الصخرة والقيامة وجبل الطور في مشهد واحد لا نظير له.' }
       ]
     },
+    videoStory: {
+      title: 'إطلالة من فوق القدس',
+      description: 'مشهد بانورامي قصير يوسّع الحكاية من الحجر المفرد إلى أفق المدينة وأسوارها.',
+      durationSeconds: 7,
+      videoUrl: '/video/places/jerusalem-walls.mp4',
+      posterUrl: '/video/places/jerusalem-walls.jpg',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:View_from_Notre_Dame_de_Jerusalem_P1010162.ogv',
+      sourceLabel: 'Wikimedia Commons · deror_avi',
+      license: 'CC BY-SA 3.0',
+    },
     nearbyPlaces: [
       {
         placeId: 'p-1',
@@ -772,6 +822,16 @@ export const JERUSALEM_PLACES: Place[] = [
         { time: 80, text: 'مدخل حميم يقودك إلى حارة السعدية وباب حطة والأزقة المبلطة...' },
         { time: 125, text: 'هنا تعيش العائلات المقدسية جيلًا بعد جيل صامدين كحجارة السور.' }
       ]
+    },
+    videoStory: {
+      title: 'طبقات الصخر قرب باب الساهرة',
+      description: 'لقطة حية من مغارة سليمان القريبة من الجدار الشمالي الشرقي، تكشف طبقات الحجر التي تحيط بحكاية الباب.',
+      durationSeconds: 8,
+      videoUrl: '/video/places/bab-al-sahira.mp4',
+      posterUrl: '/video/places/bab-al-sahira.jpg',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Jerusalem,_Zedekiah%27s_Tears_in_Zedekiah%27s_Cave_MVI_7240.ogv',
+      sourceLabel: 'Wikimedia Commons · Deror Avi',
+      license: 'CC BY-SA 3.0',
     },
     nearbyPlaces: [
       {

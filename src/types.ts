@@ -82,6 +82,17 @@ export interface Place {
     isAiGenerated?: boolean;
     audioTextHighlights: Array<{ time: number; text: string }>;
   };
+  /** A short, optional real-world scene paired with this location. */
+  videoStory?: {
+    title: string;
+    description: string;
+    durationSeconds: number;
+    videoUrl: string;
+    posterUrl: string;
+    sourceUrl: string;
+    sourceLabel: string;
+    license: string;
+  };
   nearbyPlaces: NearbyPlace[];
   challenge: Challenge;
   sources: SourceCitation[];
