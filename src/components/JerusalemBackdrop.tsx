@@ -75,10 +75,9 @@ export function JerusalemBackdrop() {
       resumeAfterSeek = false;
       if (canMove()) {
         if (!loaded) {
-          // Choose one source per visit so resizing and theme changes never restart it.
-          video.src = window.matchMedia('(max-width: 767px)').matches
-            ? '/video/jerusalem-cinema-mobile.mp4'
-            : '/video/jerusalem-cinema.mp4';
+          // Keep one full-HD source for every viewport so the hero never falls
+          // back to a softer mobile encode after an orientation change.
+          video.src = '/video/jerusalem-old-city-hero.mp4';
           video.load();
           loaded = true;
         }
@@ -113,7 +112,7 @@ export function JerusalemBackdrop() {
 
   return (
     <div ref={sceneRef} className="sira-cinema-backdrop" aria-hidden="true">
-      <video ref={videoRef} muted loop playsInline preload="none" poster="/video/jerusalem-cinema-poster.jpg" disablePictureInPicture tabIndex={-1} />
+      <video ref={videoRef} muted loop playsInline preload="metadata" poster="/video/jerusalem-old-city-hero-poster.jpg" disablePictureInPicture tabIndex={-1} />
       <div className="sira-cinema-shade" />
     </div>
   );

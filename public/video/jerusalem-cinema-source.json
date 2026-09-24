@@ -1,25 +1,19 @@
 {
-  "title": "Jerusalem Old City - Pan and Zoom from Tower of David High Points 4K",
-  "author": "YeshuaAgapao",
-  "date": "2015-11-05",
-  "source": "https://commons.wikimedia.org/wiki/File:Jerusalem_Old_City_-_Pan_and_Zoom_from_Tower_of_David_High_Points_4K.webm",
-  "license": "CC BY 3.0",
-  "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
-  "sourceExcerptSeconds": [
-    13,
-    23
-  ],
+  "title": "People Outside the Dome of the Rock",
+  "author": "Abimelec Castillo",
+  "source": "https://www.pexels.com/video/people-outside-the-dome-of-the-rock-4202514/",
+  "license": "Pexels License",
+  "licenseUrl": "https://www.pexels.com/license/",
+  "sourceDurationSeconds": 23.06,
   "changes": [
-    "Silent excerpt",
-    "25 fps H.264 with a keyframe every 10 frames",
-    "0.6-second tail/head crossfade for looping",
-    "1280x720 desktop and 768x432 mobile versions",
-    "Poster extracted from the edited video",
-    "Responsive object-fit cropping; no theme-dependent color filters"
+    "Original 1920x1080 H.264 time-lapse footage at 30 fps",
+    "Silent, looping view of the Dome of the Rock and its courtyard",
+    "Matching 1920x1080 poster supplied by the source",
+    "Responsive cinematic crop with no quality-reducing filters",
+    "A single full-HD source is used on desktop and mobile"
   ],
   "files": [
-    "/video/jerusalem-cinema.mp4",
-    "/video/jerusalem-cinema-mobile.mp4",
-    "/video/jerusalem-cinema-poster.jpg"
+    "/video/jerusalem-old-city-hero.mp4",
+    "/video/jerusalem-old-city-hero-poster.jpg"
   ]
 }

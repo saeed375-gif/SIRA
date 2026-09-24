@@ -52,8 +52,9 @@ body {
   --cinema-direction: 270deg;
 }
 .sira-cinema-hero:dir(ltr) { --cinema-direction: 90deg; }
-.sira-cinema-backdrop { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: #171a1b; }
-.sira-cinema-backdrop video { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; filter: none; opacity: 1; }
+.sira-cinema-backdrop { position: absolute; inset: 0; z-index: -2; pointer-events: none; overflow: hidden; background: #171a1b; }
+.sira-cinema-backdrop video { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 52%; filter: none; opacity: 1; transform: scale(1.018); transition: transform 9s ease-out; will-change: transform; }
+.sira-cinema-hero:hover .sira-cinema-backdrop video { transform: scale(1.045); }
 .sira-cinema-shade { position: absolute; inset: 0; background: linear-gradient(var(--cinema-direction), #090d16d9, #090d1655 48%, #090d160a 78%), linear-gradient(0deg, #090d16b3, transparent 28%, transparent 80%, #090d1633); }
 .sira-cinema-content { width: min(100% - 4rem, 1216px); margin-inline: auto; padding-block: 5rem 8rem; }
 .sira-cinema-copy { max-width: 620px; }
@@ -79,7 +80,7 @@ body {
 .sira-cinema-hero:dir(ltr) .sira-cinema-progress span { transform-origin: left; }
 @media (max-width: 767px) {
   .sira-cinema-hero { min-height: max(610px, calc(100svh - 144px)); align-items: end; }
-  .sira-cinema-backdrop video { position: absolute; top: -22%; height: 122%; object-position: 48% center; }
+  .sira-cinema-backdrop video { position: absolute; top: -12%; height: 112%; object-position: 50% center; }
   .sira-cinema-content { width: calc(100% - 2rem); padding-block: 6rem 7rem; }
   .sira-cinema-copy h1 { font-size: clamp(2.65rem, 10vw, 4.2rem); }
   .sira-cinema-copy > p { font-size: .85rem; max-width: 340px; }
@@ -92,6 +93,9 @@ body {
 @media (max-width: 360px) {
   .sira-cinema-primary > svg:last-child { display: none; }
   .sira-cinema-actions button { padding-inline: .8rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sira-cinema-backdrop video { transform: none; transition: none; }
 }
 
 /* Custom sleek scrollbar for Sira */
