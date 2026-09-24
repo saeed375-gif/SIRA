@@ -627,7 +627,7 @@ export default function App() {
         favoritesCount={favorites.length}
       />
 
-      <SiraAssistant onNavigate={navigate} />
+      <SiraAssistant onNavigate={navigate} language={language} theme={theme} />
     </div>
   );
 }

@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import OpenAI from 'openai';
-import { config, hasOpenAI } from './config.js';
+import { GoogleGenAI, HarmBlockThreshold, HarmCategory } from '@google/genai';
+import { config, hasGemini } from './config.js';
 import { rateLimit } from './rateLimit.js';
 import { restPath, supabaseFetch } from './supabaseRest.js';
 
 type ChatTurn = { role: 'user' | 'assistant'; content: string };
+type AssistantLanguage = 'ar' | 'en' | 'pt' | 'tr' | 'ru' | 'fr' | 'zh-CN' | 'ja' | 'ko';
 type PlatformPlace = { slug?: string; name_ar?: string | null; short_description_ar?: string | null; district_ar?: string | null };
 type PlatformRoute = { slug?: string; title_ar?: string | null; subtitle_ar?: string | null; description_ar?: string | null; estimated_minutes?: number | null; distance_km?: number | string | null };
 type PlatformStory = { title_ar?: string | null; excerpt_ar?: string | null; description_ar?: string | null; place?: { slug?: string; name_ar?: string | null } | null };
@@ -17,8 +18,9 @@ const KNOWLEDGE_TTL_MS = 5 * 60_000;
 let knowledgeCache: { value: AssistantKnowledge; expiresAt: number } | null = null;
 
 function httpError(message: string, status: number) {
-  const error = new Error(message) as Error & { status?: number };
+  const error = new Error(message) as Error & { status?: number; expose?: boolean };
   error.status = status;
+  error.expose = true;
   return error;
 }
 
@@ -37,6 +39,11 @@ function readTurns(value: unknown): ChatTurn[] {
     const content = cleanText(turn.content, MAX_MESSAGE_LENGTH);
     return content ? [{ role: turn.role, content }] : [];
   });
+}
+
+function readLanguage(value: unknown): AssistantLanguage {
+  const languages: AssistantLanguage[] = ['ar', 'en', 'pt', 'tr', 'ru', 'fr', 'zh-CN', 'ja', 'ko'];
+  return typeof value === 'string' && languages.includes(value as AssistantLanguage) ? value as AssistantLanguage : 'ar';
 }
 
 function describePlace(place: PlatformPlace) {
@@ -98,10 +105,14 @@ function navigationSuggestions(message: string, knowledge: AssistantKnowledge) {
   return [{ label: 'استكشف الأماكن', path: '/explore' }, { label: 'ابحث في سِيرة', path: '/search' }];
 }
 
-const instructions = (knowledge: string) => `أنت «دليل سِيرة الذكي» داخل منصة سِيرة عن القدس. مهمتك هي مساعدة الزائر على اكتشاف الأماكن والمسارات والحكايات والألعاب المتاحة في المنصة.
+const languageNames: Record<AssistantLanguage, string> = {
+  ar: 'العربية الفصحى', en: 'English', pt: 'Português', tr: 'Türkçe', ru: 'Русский', fr: 'Français', 'zh-CN': '中文（简体）', ja: '日本語', ko: '한국어',
+};
+
+const instructions = (knowledge: string, language: AssistantLanguage) => `أنت «دليل سِيرة الذكي» داخل منصة سِيرة عن القدس. مهمتك هي مساعدة الزائر على اكتشاف الأماكن والمسارات والحكايات والألعاب المتاحة في المنصة.
 
 قواعد إلزامية:
-- أجب بالعربية الفصحى الواضحة وبنبرة دافئة، إلا إذا طلب المستخدم لغة أخرى بوضوح.
+- أجب دائمًا بلغة واجهة الزائر الحالية: ${languageNames[language]}. لا تغيّر اللغة من تلقاء نفسك.
 - استخدم فقط مادة سِيرة المرجعية أدناه للحقائق عن القدس والمنصة. لا تستخدم معرفة عامة أو تخمّن.
 - إن لم تحتوِ المادة على جواب، قل ذلك بوضوح واقترح صفحة مناسبة داخل سِيرة. لا تخترع مصادر أو تواريخ أو تفاصيل.
 - لا تقدّم تعليمات خطرة أو قانونية أو طبية، ولا تدّعِ أنك مرشد ميداني أو مصدر تاريخي مستقل.
@@ -116,26 +127,40 @@ router.post('/chat', rateLimit(12, 60_000), async (req, res, next) => {
   try {
     // This is a controlled product state, not an application failure. Return a
     // helpful response without exposing any deployment or secret details.
-    if (!hasOpenAI()) return res.status(503).json({ error: 'دليل سِيرة الذكي غير متاح مؤقتًا. أعد المحاولة لاحقًا.' });
+    if (!hasGemini()) return res.status(503).json({ error: 'دليل سِيرة الذكي غير متاح مؤقتًا. أعد المحاولة لاحقًا.' });
     const message = cleanText(req.body?.message, MAX_MESSAGE_LENGTH);
     if (message.length < 2) throw httpError('اكتب سؤالًا من حرفين على الأقل.', 400);
     const history = readTurns(req.body?.history);
-    const client = new OpenAI({ apiKey: config.openaiApiKey });
-    const moderation = await client.moderations.create({ model: 'omni-moderation-latest', input: message });
-    if (moderation.results[0]?.flagged) return res.status(400).json({ error: 'لا يمكنني متابعة هذا الطلب. يمكنني مساعدتك في استكشاف محتوى سِيرة.' });
+    const language = readLanguage(req.body?.language);
     const knowledge = await getKnowledge();
-    const response = await client.responses.create({
-      model: config.openaiModel,
-      instructions: instructions(knowledge.context),
-      input: [...history, { role: 'user', content: message }],
-      max_output_tokens: 700,
+    const client = new GoogleGenAI({ apiKey: config.geminiApiKey });
+    const response = await client.models.generateContent({
+      model: config.geminiModel,
+      contents: [
+        ...history.map((turn) => ({ role: turn.role === 'assistant' ? 'model' : 'user', parts: [{ text: turn.content }] })),
+        { role: 'user', parts: [{ text: message }] },
+      ],
+      config: {
+        systemInstruction: instructions(knowledge.context, language),
+        temperature: 0.2,
+        maxOutputTokens: 700,
+        safetySettings: [
+          HarmCategory.HARM_CATEGORY_HARASSMENT,
+          HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        ].map((category) => ({ category, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE })),
+      },
     });
-    const answer = cleanText(response.output_text, 3_200);
+    const wasBlocked = Boolean(response.promptFeedback?.blockReason || response.candidates?.some((candidate) => candidate.finishReason === 'SAFETY'));
+    if (wasBlocked) return res.status(400).json({ error: 'لا يمكنني متابعة هذا الطلب. يمكنني مساعدتك في استكشاف محتوى سِيرة.' });
+    const answer = cleanText(response.text, 3_200);
     if (!answer) throw httpError('لم يتم إنشاء إجابة للمساعد.', 502);
     res.json({ answer, suggestions: navigationSuggestions(message, knowledge) });
   } catch (error: any) {
-    if (!error?.status) error.status = 502;
-    next(error);
+    if (error?.expose) return next(error);
+    console.error('[Sira assistant] Gemini request failed.', error?.message || error);
+    next(httpError('تعذر الوصول إلى الدليل الذكي حاليًا.', 502));
   }
 });
 

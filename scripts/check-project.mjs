@@ -14,8 +14,8 @@ if (!src.includes('loadSiraDatabaseData')) fail('Supabase/API data overlay is no
 const assistantUi = read('src/components/SiraAssistant.tsx');
 const assistantApi = read('server/assistantApi.ts');
 if (!assistantUi.includes("/api/assistant/chat") || !src.includes('SiraAssistant')) fail('Sira assistant UI is not wired into the app'); else ok('Sira assistant UI wired into the app');
-if (!assistantApi.includes('OPENAI') && !assistantApi.includes('OpenAI')) fail('Sira assistant API is missing'); else ok('Sira assistant API configured server-side');
-if (assistantUi.includes('OPENAI_API_KEY') || src.includes('OPENAI_API_KEY')) fail('OpenAI key name leaked into frontend source'); else ok('no OpenAI key name in frontend source');
+if (!assistantApi.includes('GoogleGenAI')) fail('Sira assistant Gemini API is missing'); else ok('Sira assistant Gemini API configured server-side');
+if (assistantUi.includes('GEMINI_API_KEY') || src.includes('GEMINI_API_KEY')) fail('Gemini key name leaked into frontend source'); else ok('no Gemini key name in frontend source');
 
 if (!map.includes("from '@googlemaps/js-api-loader'") || !map.includes('new google.maps.Map(') || !map.includes('VITE_GOOGLE_MAPS_API_KEY')) fail('Google Maps implementation missing'); else ok('Google Maps implementation configured');
 
