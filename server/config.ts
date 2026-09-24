@@ -8,9 +8,13 @@ export const config = {
   supabaseUrl: read('SUPABASE_URL'),
   supabaseAnonKey: read('SUPABASE_ANON_KEY'),
   supabaseServiceRoleKey: read('SUPABASE_SERVICE_ROLE_KEY'),
+  // Server-only. Never expose this through Vite's VITE_* variables.
+  openaiApiKey: read('OPENAI_API_KEY'),
+  openaiModel: read('OPENAI_MODEL', 'gpt-5.4-mini'),
 };
 
 export const hasSupabase = () => Boolean(config.supabaseUrl && config.supabaseAnonKey);
+export const hasOpenAI = () => Boolean(config.openaiApiKey);
 
 export function assertSupabase() {
   if (!hasSupabase()) {

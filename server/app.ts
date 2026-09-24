@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import publicApi from './publicApi.js';
 import authApi from './authApi.js';
 import adminApi from './adminApi.js';
+import assistantApi from './assistantApi.js';
 import { hasSupabase } from './config.js';
 import { SupabaseHttpError } from './supabaseRest.js';
 
@@ -21,6 +22,7 @@ app.use(express.json({ limit: '1mb' }));
 app.get('/api/health', (_req, res) => res.json({ ok: true, supabaseConfigured: hasSupabase() }));
 app.use('/api/auth', authApi);
 app.use('/api/admin', adminApi);
+app.use('/api/assistant', assistantApi);
 app.use('/api', publicApi);
 
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

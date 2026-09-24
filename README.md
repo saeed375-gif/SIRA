@@ -15,7 +15,7 @@ View your app in AI Studio: https://ai.studio/apps/cbe00d19-4132-4170-9603-1dd1b
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+2. Copy `.env.example` to `.env` and configure Supabase. To enable the Sira guide, add the server-only `OPENAI_API_KEY` (never expose it as a `VITE_*` variable).
 3. Run the app:
    `npm run dev`
 
@@ -48,6 +48,15 @@ npm run dev
 
 - Vite frontend: `http://localhost:3000` (or the next free port)
 - API health: `http://localhost:8787/api/health`
+
+### Sira intelligent guide
+
+The floating **"اسأل سِيرة"** guide calls `POST /api/assistant/chat`. Its API key stays on the Express/Vercel server, requests are rate-limited and moderated, and the model is grounded in the currently published places, routes, and life stories from Supabase. It does not save conversations to a user account. Set these server environment variables locally and in Vercel:
+
+```bash
+OPENAI_API_KEY=...
+OPENAI_MODEL=gpt-5.4-mini
+```
 
 The Vite dev server proxies `/api` to port `8787`, so the frontend does not need a separate API URL locally.
 

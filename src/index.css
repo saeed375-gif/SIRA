@@ -215,6 +215,20 @@ section[id] { scroll-margin-top: 145px; }
   }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+
+/* The guide is an optional, fixed layer. It never changes the page layout or
+   blocks the mobile navigation until the visitor explicitly opens it. */
+.sira-assistant { position: fixed; z-index: 60; inset-inline-end: max(1rem, env(safe-area-inset-right)); bottom: max(1.25rem, env(safe-area-inset-bottom)); }
+.sira-assistant-trigger { min-height: 48px; display: inline-flex; align-items: center; gap: .55rem; border: 1px solid #f8dd91; border-radius: 999px; padding: .7rem 1rem; background: linear-gradient(135deg, #e5c158, #bd8326); color: #110b29; font-size: .78rem; font-weight: 800; box-shadow: 0 14px 34px #08041680, 0 0 0 4px #e5c1581f; transition: transform .2s, box-shadow .2s, background .2s; }
+.sira-assistant-trigger:hover { transform: translateY(-2px); background: linear-gradient(135deg, #ffe79a, #e5c158); box-shadow: 0 17px 38px #08041699, 0 0 0 5px #e5c1582e; }
+.sira-assistant-panel { position: absolute; inset-inline-end: 0; bottom: calc(100% + .9rem); width: min(390px, calc(100vw - 2rem)); height: min(610px, calc(100dvh - 6rem)); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #4b3689; border-radius: 22px; background: #110b29; color: #faf8f5; box-shadow: 0 28px 72px #07030fbd; animation: sira-assistant-in .18s ease-out; }
+.sira-assistant-messages { flex: 1; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: .75rem; padding: 1rem; scrollbar-gutter: stable; }
+@keyframes sira-assistant-in { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (max-width: 767px) {
+  .sira-assistant { bottom: calc(5.8rem + env(safe-area-inset-bottom)); inset-inline-end: 1rem; }
+  .sira-assistant-panel { position: fixed; inset-inline: 1rem; bottom: calc(5.8rem + env(safe-area-inset-bottom)); width: auto; height: min(650px, calc(100dvh - 8rem)); }
+}
+@media (prefers-reduced-motion: reduce) { .sira-assistant-panel { animation: none; } .sira-assistant-trigger:hover { transform: none; } }
 /* Keep OpenStreetMap key-free while matching Sira's midnight-purple visual identity. */
 .sira-map-night-tiles {
   filter: brightness(0.42) saturate(0.65) sepia(0.18) hue-rotate(205deg) contrast(1.28);

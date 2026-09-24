@@ -10,6 +10,7 @@ import { MomentView } from './components/LifeExperience';
 import { Place, Route, UserDiscoveryProgress } from './types';
 import { Navbar } from './components/Navbar';
 import { MobileBottomNav } from './components/MobileBottomNav';
+import { SiraAssistant } from './components/SiraAssistant';
 import { HomeView } from './views/HomeView';
 import { ExploreView } from './views/ExploreView';
 import { PlaceDetailView } from './views/PlaceDetailView';
@@ -625,6 +626,8 @@ export default function App() {
         onNavigate={navigate}
         favoritesCount={favorites.length}
       />
+
+      <SiraAssistant onNavigate={navigate} />
     </div>
   );
 }

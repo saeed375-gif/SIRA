@@ -11,6 +11,11 @@ const src = read('src/App.tsx') + '\n' + read('src/services/siraData.ts') + '\n'
 if (src.includes('SUPABASE_SERVICE_ROLE_KEY')) fail('service-role key name leaked into frontend source'); else ok('no service-role key in frontend source');
 if (/AIza[0-9A-Za-z_-]{20,}/.test(src)) fail('hard-coded Google API key detected in frontend source'); else ok('no hard-coded Google API key in frontend source');
 if (!src.includes('loadSiraDatabaseData')) fail('Supabase/API data overlay is not wired into App'); else ok('Supabase/API data overlay wired into App');
+const assistantUi = read('src/components/SiraAssistant.tsx');
+const assistantApi = read('server/assistantApi.ts');
+if (!assistantUi.includes("/api/assistant/chat") || !src.includes('SiraAssistant')) fail('Sira assistant UI is not wired into the app'); else ok('Sira assistant UI wired into the app');
+if (!assistantApi.includes('OPENAI') && !assistantApi.includes('OpenAI')) fail('Sira assistant API is missing'); else ok('Sira assistant API configured server-side');
+if (assistantUi.includes('OPENAI_API_KEY') || src.includes('OPENAI_API_KEY')) fail('OpenAI key name leaked into frontend source'); else ok('no OpenAI key name in frontend source');
 
 if (!map.includes("from '@googlemaps/js-api-loader'") || !map.includes('new google.maps.Map(') || !map.includes('VITE_GOOGLE_MAPS_API_KEY')) fail('Google Maps implementation missing'); else ok('Google Maps implementation configured');
 
