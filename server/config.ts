@@ -10,9 +10,10 @@ export const config = {
   supabaseServiceRoleKey: read('SUPABASE_SERVICE_ROLE_KEY'),
   // Server-only. Never expose this through Vite's VITE_* variables.
   geminiApiKey: read('GEMINI_API_KEY'),
-  geminiModel: read('GEMINI_MODEL', 'gemini-3.8-flash'),
-  // A lower-latency backup used only when Gemini reports temporary capacity limits.
-  geminiFallbackModel: read('GEMINI_FALLBACK_MODEL', 'gemini-3.5-flash-lite'),
+  // Flash-Lite is the fast default for an interactive text assistant.
+  geminiModel: read('GEMINI_MODEL', 'gemini-3.5-flash-lite'),
+  // A higher-capability backup used only when the primary model is temporarily unavailable.
+  geminiFallbackModel: read('GEMINI_FALLBACK_MODEL', 'gemini-3.8-flash'),
 };
 
 export const hasSupabase = () => Boolean(config.supabaseUrl && config.supabaseAnonKey);

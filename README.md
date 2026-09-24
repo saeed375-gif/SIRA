@@ -55,8 +55,8 @@ The floating **"اسأل سِيرة"** guide calls `POST /api/assistant/chat`. I
 
 ```bash
 GEMINI_API_KEY=...
-GEMINI_MODEL=gemini-3.8-flash
-GEMINI_FALLBACK_MODEL=gemini-3.5-flash-lite
+GEMINI_MODEL=gemini-3.5-flash-lite
+GEMINI_FALLBACK_MODEL=gemini-3.8-flash
 ```
 
 The Vite dev server proxies `/api` to port `8787`, so the frontend does not need a separate API URL locally.
