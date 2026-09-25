@@ -23,7 +23,7 @@ View your app in AI Studio: https://ai.studio/apps/cbe00d19-4132-4170-9603-1dd1b
 
 The repository includes a Capacitor Android app (`com.sira.jerusalem`) that bundles the same Arabic-first interface, including its mobile navigation and safe-area treatment.
 
-1. Put the deployed HTTPS API origin in `VITE_API_BASE_URL` (this is required because a native WebView does not share the website origin).
+1. `VITE_API_BASE_URL` is set in `.env.android` to the production API origin (this is required because a native WebView does not share the website origin).
 2. Run `npm run build:android` to build the web bundle and synchronize it into `android/`.
 3. Open `android/` with Android Studio, then create a signed release APK or AAB from the standard **Generate Signed Bundle / APK** flow.
 
