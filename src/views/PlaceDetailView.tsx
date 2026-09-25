@@ -8,6 +8,7 @@ import { InteractiveTimeline } from '../components/InteractiveTimeline';
 import { PlaceChallenge } from '../components/PlaceChallenge';
 import { SourcesModal } from '../components/SourcesModal';
 import { JerusalemMap } from '../components/JerusalemMap';
+import { RealPlaceScene } from '../components/RealPlaceScene';
 import { 
   MapPin, 
   Map, 
@@ -189,6 +190,14 @@ export const PlaceDetailView: React.FC<PlaceDetailViewProps> = ({
               )}
 
               <button
+                onClick={() => scrollToSection('real-scene-section')}
+                className="min-h-12 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#160E36]/90 hover:bg-[#251854] text-[#FAF8F5] font-bold text-xs sm:text-sm border border-[#3C2975] hover:border-[#D4AF37] backdrop-blur-md shadow-xl transition-all active:scale-95"
+              >
+                <Sparkles className="w-4 h-4 text-[#E5C158]" />
+                <span>شاهد المشهد الواقعي</span>
+              </button>
+
+              <button
                 onClick={() => scrollToSection('challenge-section')}
                 className="min-h-12 flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#160E36]/90 hover:bg-[#251854] text-[#E5C158] font-bold text-xs sm:text-sm border border-[#D4AF37]/40 backdrop-blur-md shadow-xl transition-all active:scale-95 min-[420px]:col-span-2 sm:col-span-1"
               >
@@ -208,7 +217,7 @@ export const PlaceDetailView: React.FC<PlaceDetailViewProps> = ({
       </section>
 
       <nav aria-label="أقسام المكان" className="sticky top-[72px] z-30 bg-[#110B29]/95 backdrop-blur border-y border-[#3C2975] flex gap-5 overflow-x-auto px-5 py-3 text-xs text-[#E5C158]">
-        {[['timeline-section', 'التاريخ'], ['geography-section', 'الجغرافيا'], ...(storiesForPlace(place.id).length ? [['life-section', 'الحياة في المكان']] : []), ...(place.videoStory ? [['video-section', 'المشهد الحي']] : []), ['audio-section', 'الصوت'], ['challenge-section', 'التحدي']].map(([id, label]) => <button key={id} className="shrink-0 py-2" onClick={() => scrollToSection(id)}>{label}</button>)}
+        {[['timeline-section', 'التاريخ'], ['real-scene-section', 'مشهد واقعي'], ['geography-section', 'الجغرافيا'], ...(storiesForPlace(place.id).length ? [['life-section', 'الحياة في المكان']] : []), ...(place.videoStory ? [['video-section', 'المشهد الحي']] : []), ['audio-section', 'الصوت'], ['challenge-section', 'التحدي']].map(([id, label]) => <button key={id} className="shrink-0 py-2" onClick={() => scrollToSection(id)}>{label}</button>)}
       </nav>
       {/* MAIN PROGRESSIVE DISCOVERY BODY */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
@@ -251,6 +260,8 @@ export const PlaceDetailView: React.FC<PlaceDetailViewProps> = ({
         </section>
 
         <PlaceLifeSection place={place} onNavigate={onNavigate} onSuccess={points => onPlaceChallengeSuccess(`life:${place.id}`, points)} />
+
+        <RealPlaceScene place={place} />
 
         {/* 2. استمع إلى حكاية المكان (Custom Audio Player with Waveform) */}
         <section id="audio-section">

@@ -17,6 +17,10 @@ if (!assistantUi.includes("/api/assistant/chat") || !src.includes('SiraAssistant
 if (!assistantApi.includes('GoogleGenAI')) fail('Sira assistant Gemini API is missing'); else ok('Sira assistant Gemini API configured server-side');
 if (assistantUi.includes('GEMINI_API_KEY') || src.includes('GEMINI_API_KEY')) fail('Gemini key name leaked into frontend source'); else ok('no Gemini key name in frontend source');
 
+const realScene = read('src/components/RealPlaceScene.tsx');
+const placeDetail = read('src/views/PlaceDetailView.tsx');
+if (!realScene.includes('REAL_TOURS') || !realScene.includes('youtube-nocookie.com') || !placeDetail.includes('RealPlaceScene')) fail('verified real-place scenes are not wired into place detail pages'); else ok('verified real-place scenes wired into place detail pages');
+
 if (!map.includes("from '@googlemaps/js-api-loader'") || !map.includes('new google.maps.Map(') || !map.includes('VITE_GOOGLE_MAPS_API_KEY')) fail('Google Maps implementation missing'); else ok('Google Maps implementation configured');
 
 const placesData = read('src/data/jerusalemData.ts');

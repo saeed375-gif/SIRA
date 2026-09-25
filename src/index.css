@@ -154,6 +154,39 @@ body {
 button, summary { -webkit-tap-highlight-color: transparent; }
 button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2px solid #ffe79a; outline-offset: 4px; }
 section[id] { scroll-margin-top: 145px; }
+
+/* Verified tours and footage: content is deferred until a visitor explicitly
+   opens it, keeping third-party viewers out of the initial page load. */
+.sira-real-scene { overflow: hidden; border: 1px solid #d4af3775; border-radius: 24px; background: linear-gradient(145deg, #1b1040, #0d0820); box-shadow: 0 24px 60px #06030f80; }
+.sira-real-scene-header { display: flex; align-items: start; justify-content: space-between; gap: 1rem; padding: clamp(1.15rem, 3vw, 1.8rem); border-bottom: 1px solid #3c2975; }
+.sira-real-scene-header > div { max-width: 700px; }
+.sira-real-scene-header > div > span { display: inline-flex; align-items: center; gap: .42rem; color: #e5c158; font-size: .72rem; font-weight: 800; letter-spacing: .04em; }
+.sira-real-scene h2 { margin: .45rem 0; color: #fff9ea; font-family: 'Amiri', 'Traditional Arabic', serif; font-size: clamp(1.55rem, 3vw, 2.25rem); line-height: 1.25; }
+.sira-real-scene-header p { margin: 0; color: #d8cee8; font-size: .83rem; line-height: 1.8; }
+.sira-real-scene-badge { display: inline-flex; align-items: center; gap: .4rem; flex: 0 0 auto; border: 1px solid #806ca8; border-radius: 999px; padding: .55rem .72rem; color: #dbd1ed; font-size: .69rem; font-weight: 800; white-space: nowrap; }
+.sira-real-scene-badge.is-360 { border-color: #e5c158; background: #e5c15814; color: #ffe49a; }
+.sira-real-scene-launch { position: relative; display: grid; min-height: clamp(270px, 42vw, 430px); place-items: center; overflow: hidden; background: #0a0618; }
+.sira-real-scene-launch > img, .sira-real-scene-launch > div { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.sira-real-scene-launch > img { opacity: .72; filter: saturate(.9) contrast(1.06); }
+.sira-real-scene-launch > div { background: radial-gradient(circle at 50% 45%, transparent 0%, #1008246e 48%, #090514e8 100%); }
+.sira-real-scene-launch button { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: .65rem; min-height: 52px; border: 1px solid #f4d982; border-radius: 14px; padding: .9rem 1.25rem; background: #e5c158; color: #160d2d; font: inherit; font-size: .86rem; font-weight: 900; cursor: pointer; box-shadow: 0 16px 38px #0008; transition: transform .2s, background .2s; }
+.sira-real-scene-launch button:hover { background: #ffe79a; transform: translateY(-2px) scale(1.02); }
+.sira-real-scene-launch > span { position: absolute; z-index: 1; bottom: 1rem; color: #f4ecdc; font-size: .68rem; }
+.sira-real-scene-frame { aspect-ratio: 16 / 9; background: #080511; }
+.sira-real-scene-frame iframe, .sira-real-scene-frame video { display: block; width: 100%; height: 100%; border: 0; background: #080511; object-fit: cover; }
+.sira-real-scene footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem; padding: .8rem 1.1rem; background: #110b29; color: #c9bfdb; font-size: .7rem; }
+.sira-real-scene footer > span, .sira-real-scene footer a { display: inline-flex; align-items: center; gap: .4rem; }
+.sira-real-scene footer a { color: #e5c158; font-weight: 800; }
+.sira-real-scene footer a:hover { color: #ffe79a; text-decoration: underline; }
+.sira-real-scene-note { margin: 0; border-top: 1px solid #3c2975; padding: .75rem 1.1rem; color: #ab9ebd; font-size: .7rem; line-height: 1.7; }
+@media (max-width: 640px) {
+  .sira-real-scene-header { display: block; padding: 1.05rem; }
+  .sira-real-scene-badge { margin-top: .8rem; }
+  .sira-real-scene-launch { min-height: 255px; }
+  .sira-real-scene-launch button { min-height: 48px; padding: .8rem 1rem; font-size: .78rem; }
+  .sira-real-scene-frame { aspect-ratio: 4 / 3; }
+  .sira-real-scene footer { align-items: start; flex-direction: column; padding: .8rem 1rem; }
+}
 @media (max-width: 640px) { .life-moments-strip { grid-auto-columns: 87%; } .life-route-row { gap: .65rem; padding: .8rem; } .life-route-row img { width: 56px; height: 64px; } }
 @media (max-width: 640px) {
   /* Leaflet's stock 30px controls are too small for a touch screen. */
