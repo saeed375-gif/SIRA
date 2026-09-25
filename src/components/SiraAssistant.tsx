@@ -1,6 +1,7 @@
 import React, { FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, LoaderCircle, RotateCcw, SendHorizonal, X } from 'lucide-react';
 import { getLanguageDirection, type PlatformLanguage } from '../lib/translation';
+import { apiUrl } from '../lib/api';
 
 type Message = { id: string; role: 'user' | 'assistant'; content: string };
 type Suggestion = { label: string; path: string };
@@ -56,7 +57,7 @@ export function SiraAssistant({ onNavigate, language, theme }: SiraAssistantProp
     setMessages((current) => [...current, { id: requestId(), role: 'user', content }]);
     setInput(''); setError(''); setSuggestions([]); setIsLoading(true);
     try {
-      const response = await fetch('/api/assistant/chat', {
+      const response = await fetch(apiUrl('/api/assistant/chat'), {
         method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ message: content, language, history: previousMessages.slice(-8).map(({ role, content: turnContent }) => ({ role, content: turnContent })) }),
       });

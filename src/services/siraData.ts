@@ -1,8 +1,8 @@
 import type { Place, Route } from '../types';
 import { JERUSALEM_PLACES, JERUSALEM_ROUTES } from '../data/jerusalemData';
 import { LIFE_ROUTES } from '../data/lifeData';
+import { apiUrl } from '../lib/api';
 
-const API_BASE = String((import.meta as any).env?.VITE_API_BASE_URL || '').replace(/\/$/, '');
 const STATIC_ROUTES: Route[] = [...JERUSALEM_ROUTES, ...LIFE_ROUTES];
 
 type Envelope<T> = { data: T };
@@ -34,7 +34,7 @@ type RemoteRoute = {
 };
 
 async function request<T>(path: string): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, { headers: { Accept: 'application/json' } });
+  const response = await fetch(apiUrl(path), { headers: { Accept: 'application/json' } });
   const body = await response.json().catch(() => null);
   if (!response.ok) throw new Error(body?.error || `Sira API ${response.status}`);
   return body as T;

@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "vite build",
+    "build:android": "vite build --mode android && cap sync android",
+    "android:open": "cap open android",
+    "android:sync": "cap sync android",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
@@ -21,6 +24,8 @@
     "test:schema": "supabase test db"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
     "@google/genai": "^2.4.0",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
@@ -34,6 +39,7 @@
     "vite": "^6.2.3"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
     "@googlemaps/js-api-loader": "^2.1.1",
     "@types/canvas-confetti": "^1.9.0",
     "@types/express": "^4.17.21",

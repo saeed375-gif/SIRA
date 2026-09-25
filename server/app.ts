@@ -13,6 +13,19 @@ const app = express();
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 app.use((req, res, next) => {
+  // Capacitor's Android WebView is served from a localhost-style secure origin.
+  // Permit only those native origins so bundled clients can call the deployed API.
+  const origin = req.get('origin');
+  if (origin === 'https://localhost' || origin === 'capacitor://localhost') {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  }
+  if (req.method === 'OPTIONS' && (origin === 'https://localhost' || origin === 'capacitor://localhost')) {
+    return res.sendStatus(204);
+  }
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   next();

@@ -1,3 +1,5 @@
+import { apiUrl } from '../lib/api';
+
 export interface SiraUser {
   id: string;
   email: string;
@@ -23,7 +25,7 @@ export interface SiraProgressSnapshot {
 type ApiError = Error & { code?: string; status?: number };
 
 async function request<T>(path: string, body?: unknown, accessToken?: string): Promise<T> {
-  const response = await fetch(`/api/auth${path}`, {
+  const response = await fetch(apiUrl(`/api/auth${path}`), {
     method: 'POST',
     credentials: 'include',
     headers: {
